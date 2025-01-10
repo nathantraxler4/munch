@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "rootDirs": ["src"],
+        "outDir": "dist",
+        "lib": ["es2020", "DOM"],
+        "target": "es2020",
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "types": ["node"],
+        "strict": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
+    },
+    "exclude": ["test"]
+}
