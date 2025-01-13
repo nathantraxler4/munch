@@ -2,10 +2,14 @@ import './setup/config';
 
 import { readFileSync } from 'fs';
 import { ApolloServer, ApolloServerPlugin } from '@apollo/server';
-import { startStandaloneServer } from '@apollo/server/standalone';
 import resolvers from './graphql/resolvers';
 import mongoose from 'mongoose';
 import logger from './utils/logger';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import { expressMiddleware } from '@apollo/server/express4';
+import express from 'express';
+
 
 (async () => {
     const graphqlSchemaPath =
@@ -45,9 +49,30 @@ import logger from './utils/logger';
     //  1. creates an Express app
     //  2. installs your ApolloServer instance as middleware
     //  3. prepares your app to handle incoming requests
-    const { url } = await startStandaloneServer(server, {
-        listen: { port: 4000 }
+    // 2. Start the Apollo Server
+    await server.start();
+
+    // 3. Create an Express app
+    const app = express();
+
+    // 4. Configure your custom CORS options here
+    //    For example, allow only http://localhost:3000
+    app.use(
+        '/graphql',
+        cors({
+            origin: 'http://localhost:3000', // Or your domain(s)
+            credentials: true,
+        }),
+        bodyParser.json(),
+        // 5. Attach Apollo's middleware (graphql endpoint)
+        expressMiddleware(server),
+    );
+
+    // 6. Start the Express server
+    const PORT = 4000;
+    const url = `http://localhost:${PORT}/graphql`;
+    app.listen(PORT, () => {
+        logger.info(`🚀 Server is running on ${url}`);
     });
 
-    logger.info(`🚀  Server ready at: ${url}`);
 })();

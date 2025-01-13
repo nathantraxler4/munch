@@ -31,6 +31,7 @@ export type Menu = {
 export type Mutation = {
   __typename?: 'Mutation';
   addRecipes: Array<Recipe>;
+  generateMenuFromPrompt: Menu;
 };
 
 
@@ -38,10 +39,14 @@ export type MutationAddRecipesArgs = {
   recipes: Array<RecipeInput>;
 };
 
+
+export type MutationGenerateMenuFromPromptArgs = {
+  prompt: Scalars['String']['input'];
+};
+
 export type Query = {
   __typename?: 'Query';
   generateMenu: Menu;
-  generateMenuFromPrompt: Menu;
   menus: Array<Menu>;
   recipes: Array<Recipe>;
 };
@@ -49,11 +54,6 @@ export type Query = {
 
 export type QueryGenerateMenuArgs = {
   recipes: Array<RecipeInput>;
-};
-
-
-export type QueryGenerateMenuFromPromptArgs = {
-  prompt: Scalars['String']['input'];
 };
 
 export type Recipe = {
@@ -176,11 +176,11 @@ export type MenuResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addRecipes?: Resolver<Array<ResolversTypes['Recipe']>, ParentType, ContextType, RequireFields<MutationAddRecipesArgs, 'recipes'>>;
+  generateMenuFromPrompt?: Resolver<ResolversTypes['Menu'], ParentType, ContextType, RequireFields<MutationGenerateMenuFromPromptArgs, 'prompt'>>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   generateMenu?: Resolver<ResolversTypes['Menu'], ParentType, ContextType, RequireFields<QueryGenerateMenuArgs, 'recipes'>>;
-  generateMenuFromPrompt?: Resolver<ResolversTypes['Menu'], ParentType, ContextType, RequireFields<QueryGenerateMenuFromPromptArgs, 'prompt'>>;
   menus?: Resolver<Array<ResolversTypes['Menu']>, ParentType, ContextType>;
   recipes?: Resolver<Array<ResolversTypes['Recipe']>, ParentType, ContextType>;
 };
