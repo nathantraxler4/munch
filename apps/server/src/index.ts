@@ -10,7 +10,6 @@ import cors from 'cors';
 import { expressMiddleware } from '@apollo/server/express4';
 import express from 'express';
 
-
 (async () => {
     const graphqlSchemaPath =
         process.env.NODE_ENV == 'LOCAL'
@@ -61,11 +60,11 @@ import express from 'express';
         '/graphql',
         cors({
             origin: 'http://localhost:3000', // Or your domain(s)
-            credentials: true,
+            credentials: true
         }),
         bodyParser.json(),
         // 5. Attach Apollo's middleware (graphql endpoint)
-        expressMiddleware(server),
+        expressMiddleware(server)
     );
 
     // 6. Start the Express server
@@ -74,5 +73,4 @@ import express from 'express';
     app.listen(PORT, () => {
         logger.info(`🚀 Server is running on ${url}`);
     });
-
 })();

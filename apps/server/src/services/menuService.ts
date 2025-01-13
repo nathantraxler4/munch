@@ -53,17 +53,19 @@ async function fetchMostSimilarRecipesFromPinecone(index: Index, recipe: string 
     const vector = await getEmbedding(recipe);
     const queryResponse = await queryPinecone(index, vector);
     validateQueryResponse(queryResponse);
-    const recipes: PineconeMetaData[] = queryResponse.matches.map((m) => m.metadata!) as PineconeMetaData[];
+    const recipes: PineconeMetaData[] = queryResponse.matches.map(
+        (m) => m.metadata!
+    ) as PineconeMetaData[];
     return recipes;
 }
 
 function validateQueryResponse(queryResponse: QueryResponse) {
     for (const match of queryResponse.matches) {
         if (!match.metadata) {
-           logAndThrowError({
+            logAndThrowError({
                 message: `Pinecone record missing metadata: ${match}.`,
                 code: Errors.PINECONE_ERROR
-           });
+            });
         }
     }
 }
@@ -77,12 +79,12 @@ async function queryPinecone(index: Index, vector: number[]): Promise<QueryRespo
             includeMetadata: true
         });
 
-        logger.debug("Pinecone query response.", { queryResponse });
+        logger.debug('Pinecone query response.', { queryResponse });
 
         return queryResponse;
     } catch (error) {
         logAndThrowError({
-            message: "Error occurred querying pinecone.",
+            message: 'Error occurred querying pinecone.',
             error: error,
             code: Errors.PINECONE_ERROR
         });
@@ -95,15 +97,17 @@ async function getEmbedding(prompt: string): Promise<number[]> {
         embeddings = await pc.inference.embed(EMBEDDING_MODEL, [prompt], { inputType: 'query' });
 
         if (!embeddings[0].values) {
-            throw new GraphQLError("Query did not return values for embedding.", { extensions: { code: Errors.PINECONE_ERROR } });
+            throw new GraphQLError('Query did not return values for embedding.', {
+                extensions: { code: Errors.PINECONE_ERROR }
+            });
         }
 
-        logger.debug("Embedding generated successfully.", { embeddings });
+        logger.debug('Embedding generated successfully.', { embeddings });
 
         return embeddings[0].values;
     } catch (error) {
         logAndThrowError({
-            message: "Error occurred embedding the prompt.",
+            message: 'Error occurred embedding the prompt.',
             error: error,
             code: Errors.PINECONE_ERROR
         });
@@ -145,7 +149,6 @@ function _getContentFromCompletion(
 
     const content = completion.choices[0].message.content;
     return content;
-
 }
 
 function _extractJsonArrayFromCompletion(
@@ -294,7 +297,9 @@ async function _generatePotentialRecipes(prompt: string) {
     return completion;
 }
 
-async function invokeCompletionAPI(config: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming) {
+async function invokeCompletionAPI(
+    config: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming
+) {
     let completion;
     try {
         completion = await openai.chat.completions.create(config);
@@ -309,10 +314,9 @@ async function invokeCompletionAPI(config: OpenAI.Chat.Completions.ChatCompletio
 }
 
 async function _generateBackgroundImage(prompt: string) {
-    
     if (process.env.MOCK_IMAGE_GENERATION) {
         logger.info('Mocking Text-To-Image response without calling model...');
-        return { data: [{url: "This is a fake URL." }] };
+        return { data: [{ url: 'This is a fake URL.' }] };
     }
 
     logger.info('Requesting Text-To-Image model to generate background image...');

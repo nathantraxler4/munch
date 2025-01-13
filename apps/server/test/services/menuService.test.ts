@@ -60,10 +60,10 @@ describe('generateMenu', () => {
     describe('WHEN calling generate recipe with one recipe', () => {
         test('THEN a menu object is returned', async () => {
             mockChatResponse('["some description1"]');
-            mockImageResponse("some url.");
+            mockImageResponse('some url.');
 
             const expectedMenu = {
-                backgroundImage: "some url.",
+                backgroundImage: 'some url.',
                 courses: [{ description: 'some description1', name: 'name1' }]
             };
 
@@ -92,7 +92,7 @@ describe('generateMenu', () => {
             mockChatResponse('["some description1", "some description2", "some description3"]');
 
             const expectedMenu = {
-                backgroundImage: "some url.",
+                backgroundImage: 'some url.',
                 courses: [
                     { description: 'some description1', name: 'name1' },
                     { description: 'some description2', name: 'name2' },
@@ -111,13 +111,13 @@ describe('generateMenu', () => {
     describe('WHEN the recipe input is empty', () => {
         test('THEN an empty menu is returned', async () => {
             mockChatResponse('[]');
-            mockImageResponse("");
+            mockImageResponse('');
 
             const menu = await menuService.generateMenu([]);
 
             expect(menu).toMatchObject({
                 courses: [],
-                backgroundImage: ""
+                backgroundImage: ''
             });
 
             expect(mockCreate).toHaveBeenCalled();
@@ -203,11 +203,11 @@ describe('generateMenu', () => {
             mockChatResponse('["some description1"]');
             mockImageResponse('some url.');
             mockInsertMany.mockImplementation(() => Promise.reject(new Error('DB Error')));
-        
+
             await expect(menuService.generateMenu([recipes[0]])).rejects.toThrow(
                 `Failed to insert menus into MongoDB. Menus: "${[recipes[0]]}" Error: Error: DB Error`
             );
-        
+
             expect(mockCreate).toHaveBeenCalled();
             expect(mockInsertMany).toHaveBeenCalled();
         });
