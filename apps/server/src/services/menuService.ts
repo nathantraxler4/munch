@@ -225,7 +225,7 @@ export async function insertMenus(menus: Menu[]) {
 }
 
 async function _generateImageGenPrompt(recipes: RecipeInput[] | PineconeMetaData[]) {
-    logger.info('Requesting LLM to generate descriptions...');
+    logger.info('Requesting LLM to generate image gen prompt...');
     const completion = await invokeCompletionAPI({
         model: process.env.GENERATE_RECIPE_MODEL ?? 'gpt-4o',
         messages: [
@@ -311,7 +311,7 @@ async function invokeCompletionAPI(config: OpenAI.Chat.Completions.ChatCompletio
 async function _generateBackgroundImage(prompt: string) {
     
     if (process.env.MOCK_IMAGE_GENERATION) {
-        logger.info('Mocking Text-To-Image response withoug calling model...');
+        logger.info('Mocking Text-To-Image response without calling model...');
         return { data: [{url: "This is a fake URL." }] };
     }
 
