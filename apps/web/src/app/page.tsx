@@ -29,6 +29,11 @@ export default function Home() {
       <div className="flex-1 flex flex-col justify-center items-center gap-8 pb-24 overflow-y-auto">
         {loading ? (
           <Spinner />
+        ) : error ? (
+          // Render an error message if there is an error
+          <div className="text-red-500 text-lg">
+            Error: {error.message}
+          </div>
         ) : (
           data?.generateMenuFromPrompt && <MenuDisplay menu={data.generateMenuFromPrompt} />
         )}
