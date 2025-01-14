@@ -13,7 +13,7 @@ interface PromptFormProps {
  */
 export function PromptForm({ className, userInput, onInputChange, onSubmit }: PromptFormProps) {
     return (
-        <div className={`${className} pb-12 flex justify-center bg-slate-800 w-full`}>
+        <div className={`${className} pb-12 px-24 sm:px-4 flex justify-center bg-slate-800 w-full`}>
             <form
                 onSubmit={onSubmit}
                 className={`flex items-center gap-3 p-4 bg-slate-700 rounded-md w-screen max-w-2xl focus-within:ring-2 focus-within:ring-green-600`}
@@ -23,7 +23,7 @@ export function PromptForm({ className, userInput, onInputChange, onSubmit }: Pr
                     name="user-text"
                     value={userInput}
                     onChange={onInputChange}
-                    placeholder="Tell me what you're thinking..."
+                    placeholder="Please provide me with any context relevant to crafting your perfect menu."
                     minRows={1}
                     maxRows={20}
                     className="flex-1 resize-none p-1 bg-slate-700 border border-slate-700 rounded-md focus:outline-none text-white"

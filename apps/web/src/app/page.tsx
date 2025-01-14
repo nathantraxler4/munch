@@ -30,7 +30,7 @@ export default function Home() {
         <div className="flex flex-col min-h-screen bg-slate-800">
             <div className="p-4 text-white text-2xl font-bold">Munch</div>
 
-            <div className="flex-1 flex flex-col justify-center items-center gap-8 pb-24 overflow-y-auto">
+            <div className="flex-1 flex flex-col justify-center items-center gap-8 p-24 pb-24 sm:p-4 overflow-y-auto">
                 {loading ? (
                     <Spinner />
                 ) : error ? (
