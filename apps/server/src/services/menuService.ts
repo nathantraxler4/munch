@@ -260,9 +260,10 @@ async function _generateDescriptions(recipes: RecipeInput[] | PineconeMetaData[]
             {
                 role: 'system',
                 content: `
-                    You are a master chef preparing a meal for your friends. 
-                    Pick out the 5 most important ingredients of each recipe presented to you formatted as a comma separated string. 
-                    Please order the ingredients by their importance to the dish starting with most important. 
+                    You are a master chef preparing a menu. 
+                    Pick out the 3-7 most important ingredients of each recipe presented to you formatted as a comma separated string.
+                    Please revise the name of each ingredient so it sounds as appetizing as possible. For example, if the recipe calls for 
+                    "frozen berries" revise the name to "berries". Please order the ingredients by their importance to the dish starting with most important. 
                     Please use a JSON Array to hold a list of the generated strings.  
                 `
             },
