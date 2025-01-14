@@ -16,8 +16,11 @@ class CourseClass {
     @prop({ required: true })
     name!: string;
 
-    @prop()
+    @prop({ required: true })
     description!: string;
+
+    @prop({ required: true })
+    url!: string;
 }
 
 const MenuModel = getModelForClass(MenuClass);

@@ -2,6 +2,7 @@ import ScrapedRecipeModel from '../src/models/scrapedRecipe';
 import logger from '../src/utils/logger';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import mongoose from 'mongoose';
 
 function _extractLinks(html: string) {
     const $ = cheerio.load(html);
@@ -47,19 +48,41 @@ function _extractRecipe(html: string) {
 }
 
 async function scrapeRecipes() {
-    let links = ['https://www.allrecipes.com/recipe/216755/extra-yummy-fluffy-pancakes/'];
-    const visitedLinks = new Set<string>();
-    while (links.length > 0) {
+    mongoose.connect('mongodb://127.0.0.1:27017/test');
+    
+    
+    const savedRecipes = await ScrapedRecipeModel.find({});
+    const savedLinks = savedRecipes.map(sr => sr.url);
+    let frontierLinks: string[] = [];
+    const visitedLinks = new Set<string>(savedLinks);
+
+    let i = savedLinks.length - 1;
+    while (frontierLinks.length < 10) {
+        const oldLink = savedLinks[i];
+        const [, updatedFrontierLinks] = await getHTMLAndUpdateFrontierLinks(oldLink, frontierLinks, visitedLinks);
+        frontierLinks = updatedFrontierLinks;
+        i--;
+    }
+
+    let count = 0;
+    while (frontierLinks.length > 0) {
         try {
-            const link = links.shift() ?? '';
-            const { data: html } = await axios.get(link);
-            const extractedLinks = _extractLinks(html);
-            const newLinks = setSubtraction<string>(new Set(extractedLinks), visitedLinks);
-            links = Array.from(new Set([...links, ...newLinks]));
+            if (count % 10 == 0) logger.info({ numLinksInQueue: frontierLinks.length, numVisitedLinks: visitedLinks.size });
+            const link = frontierLinks.shift() ?? '';
+            const [html, updatedFrontierLinks] = await getHTMLAndUpdateFrontierLinks(link, frontierLinks, visitedLinks);
+            frontierLinks = updatedFrontierLinks;
             const recipe = _extractRecipe(html);
             recipe.url = link;
-            await ScrapedRecipeModel.create(recipe);
+            if (!visitedLinks.has(link)) {
+                try {
+                    logger.info(`Saving Recipe with url: ${link}`);
+                    await ScrapedRecipeModel.create(recipe);
+                } catch (error) {
+                    logger.error(`An error occurred: ${error} `);
+                }
+            }
             visitedLinks.add(link);
+            count++;
         } catch (error) {
             logger.error(error);
         }
@@ -67,6 +90,34 @@ async function scrapeRecipes() {
     logger.info('Completed scrapping!');
 }
 
-scrapeRecipes().then(() => {
-    logger.info('Completed scrapping!');
-});
+async function getHTMLAndUpdateFrontierLinks(link: string, frontierLinks: string[], visitedLinks: Set<string>) {
+    let htmlData;
+    try {
+        const { data: html } = await axios.get(link);
+        htmlData = html;
+    } catch (error) {
+        logger.error(`An error occurred accessing ${link}`, error);
+    }
+    const extractedLinks = _extractLinks(htmlData);
+    const newLinks = setSubtraction<string>(new Set(extractedLinks), visitedLinks);
+    frontierLinks = Array.from(new Set([...frontierLinks, ...newLinks]));
+    return [htmlData, frontierLinks];
+}
+
+(async () => {
+    try {
+        await scrapeRecipes();
+        logger.info('Completed scraping!');
+    } catch (error) {
+        logger.error(`An error occurred: ${error}`);
+    } finally {
+        try {
+            await mongoose.connection.close();
+            logger.info('Closed database connection!');
+        } catch (closeError) {
+            logger.error(`Failed to close database connection: ${closeError}`);
+        }
+    }
+})();
+
+

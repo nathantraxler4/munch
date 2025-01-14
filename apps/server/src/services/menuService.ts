@@ -11,7 +11,7 @@ import type { QueryResponse, EmbeddingsList, Index } from '@pinecone-database/pi
 import { GraphQLError } from 'graphql';
 
 const INDEX_NAME = 'recipes';
-const INDEX_HOST = 'https://recipes2-xx1tt13.svc.aped-4627-b74a.pinecone.io';
+const INDEX_HOST = 'https://recipes-xx1tt13.svc.aped-4627-b74a.pinecone.io';
 const EMBEDDING_MODEL = 'multilingual-e5-large';
 
 /**
@@ -128,7 +128,8 @@ export async function generateMenu(recipes: RecipeInput[] | PineconeMetaData[]):
     const imageUrl = imageResponse.data[0].url || ''; // TO DO: Add more robust error handling
     const descriptions = _extractJsonArrayFromCompletion(completion);
     const names = recipes.map((r) => r.name);
-    const menu = _constructMenu(names, descriptions, imageUrl);
+    const urls = recipes.map((r) => r.url);
+    const menu = _constructMenu(names, descriptions, urls, imageUrl);
     await insertMenus([menu]);
     return menu;
 }
@@ -187,7 +188,7 @@ function _extractJsonArrayFromCompletion(
     return descriptions;
 }
 
-function _constructMenu(names: string[], descriptions: string[], imageUrl: string): Menu {
+function _constructMenu(names: string[], descriptions: string[], urls: string[], imageUrl: string): Menu {
     if (descriptions.length != names.length) {
         logAndThrowError({
             message: 'LLM did not respond with appropriate number of recipe descriptions.',
@@ -198,7 +199,8 @@ function _constructMenu(names: string[], descriptions: string[], imageUrl: strin
     const courses = descriptions.map((content: string, i: number) => {
         return {
             name: names[i],
-            description: content
+            description: content,
+            url: urls[i]
         };
     });
 

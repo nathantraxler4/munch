@@ -12,12 +12,14 @@ type Menu {
 type Course {
     name: String!
     description: String!
+    url: String!
 }
 
 input RecipeInput {
     name: String!
     ingredients: String!
     directions: String!
+    url: String!
 }
 
 type Query {

@@ -7,6 +7,7 @@ export const GENERATE_MENU_FROM_PROMPT = gql`
             courses {
                 name
                 description
+                url
             }
         }
     }

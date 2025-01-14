@@ -23,7 +23,17 @@ export function MenuDisplay({ menu }: MenuDisplayProps) {
                         key={index}
                         className="relative mb-4 sm:mb-6 p-4 sm:p-6 bg-black/50 rounded-md"
                     >
-                        <h3 className="text-sm sm:text-xl font-bold mb-2">{course.name}</h3>
+                        <h3 className="text-sm sm:text-xl font-bold mb-2">
+                            <a 
+                                href={course.url}
+                                className="text-inherit hover:underline"
+                                target="_blank" // Opens the link in a new tab
+                                rel="noopener noreferrer" // Ensures security for external links
+                            >
+                                {course.name}
+                            </a>
+                        </h3>
+                        
                         <p className="text-xs sm:text-lg text-slate-200">{course.description}</p>
                     </div>
                 ))}
