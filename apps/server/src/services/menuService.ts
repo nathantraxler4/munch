@@ -237,7 +237,7 @@ async function _generateImageGenPrompt(recipes: RecipeInput[] | PineconeMetaData
             {
                 role: 'system',
                 content: `
-                    You will be presented a list of recipes for the user. You are tasked with generating a prompt to be used with an image generation model. 
+                    You will be presented a list of recipes. You are tasked with generating a prompt to be used with an image generation model. 
                     The image will be used as a background for displaying a menu. The center should be mostly plain and 
                     take up about 90% of the image to ensure legibility of overlaying text. Ensure the image matches the mood 
                     set by this cuisine in this menu.

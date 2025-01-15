@@ -34,8 +34,7 @@ export default function Home() {
                 {loading ? (
                     <Spinner />
                 ) : error ? (
-                    // Render an error message if there is an error
-                    <div className="text-red-500 text-lg">Error: {error.message}</div>
+                    <div className="text-red-500 text-lg">{error.message}</div>
                 ) : (
                     data?.generateMenuFromPrompt && (
                         <MenuDisplay menu={data.generateMenuFromPrompt} />

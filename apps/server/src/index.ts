@@ -2,6 +2,8 @@ import './setup/config';
 
 import { readFileSync } from 'fs';
 import { ApolloServer, ApolloServerPlugin } from '@apollo/server';
+import { ApolloServerErrorCode } from '@apollo/server/errors';
+import { Errors } from './utils/errors';
 import resolvers from './graphql/resolvers';
 import mongoose from 'mongoose';
 import logger from './utils/logger';
@@ -39,7 +41,33 @@ import express from 'express';
         typeDefs,
         resolvers,
         plugins: [requestLogPlugin],
-        status400ForVariableCoercionErrors: true // Fixes bug introduced in Apollo Server 4
+        status400ForVariableCoercionErrors: true, // Fixes bug introduced in Apollo Server 4
+        formatError: (formattedError) => {
+            // Return a different error message
+            if (
+              formattedError?.extensions?.code ===
+              ApolloServerErrorCode.GRAPHQL_VALIDATION_FAILED
+            ) {
+              return {
+                ...formattedError,
+                message: "Your query doesn't match the schema. Try double-checking it!",
+              };
+            }
+
+            if (
+                formattedError?.extensions?.code ===
+                Errors.LLM_RESPONSE_PARSE_ERROR
+              ) {
+                return {
+                  ...formattedError,
+                  message: "The AI had trouble with that one. Please try again!",
+                };
+              }
+        
+            // Otherwise return the formatted error. This error can also
+            // be manipulated in other ways, as long as it's returned.
+            return formattedError;
+          },
     });
 
     mongoose.connect('mongodb://127.0.0.1:27017/test');

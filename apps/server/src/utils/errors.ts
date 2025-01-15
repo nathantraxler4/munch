@@ -2,7 +2,6 @@ import { GraphQLError } from 'graphql';
 import logger from './logger';
 
 export enum Errors {
-    LLM_RESPONSE_MISSING_CONTENT,
     LLM_RESPONSE_PARSE_ERROR,
     LLM_API_ERROR,
     IMAGE_GEN_API_ERROR,
