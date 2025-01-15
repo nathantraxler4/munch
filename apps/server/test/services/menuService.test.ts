@@ -64,7 +64,7 @@ describe('generateMenu', () => {
 
             const expectedMenu = {
                 backgroundImage: 'some url.',
-                courses: [{ description: 'some description1', name: 'name1' }]
+                courses: [{ description: 'some description1', name: 'name1', url: 'some/url1' }]
             };
 
             const menu = await menuService.generateMenu([recipes[0]]);
@@ -94,9 +94,9 @@ describe('generateMenu', () => {
             const expectedMenu = {
                 backgroundImage: 'some url.',
                 courses: [
-                    { description: 'some description1', name: 'name1' },
-                    { description: 'some description2', name: 'name2' },
-                    { description: 'some description3', name: 'name3' }
+                    { description: 'some description1', name: 'name1', url: 'some/url1' },
+                    { description: 'some description2', name: 'name2', url: 'some/url2' },
+                    { description: 'some description3', name: 'name3', url: 'some/url3' }
                 ]
             };
 

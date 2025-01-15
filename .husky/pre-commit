@@ -1,1 +1,1 @@
-npm test
+turbo run test
