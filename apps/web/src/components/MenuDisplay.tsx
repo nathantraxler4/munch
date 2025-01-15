@@ -24,7 +24,7 @@ export function MenuDisplay({ menu }: MenuDisplayProps) {
                         className="relative mb-4 sm:mb-6 p-4 sm:p-6 bg-black/50 rounded-md"
                     >
                         <h3 className="text-sm sm:text-xl font-bold mb-2">
-                            <a 
+                            <a
                                 href={course.url}
                                 className="text-inherit hover:underline"
                                 target="_blank" // Opens the link in a new tab
@@ -33,7 +33,7 @@ export function MenuDisplay({ menu }: MenuDisplayProps) {
                                 {course.name}
                             </a>
                         </h3>
-                        
+
                         <p className="text-xs sm:text-lg text-slate-200">{course.description}</p>
                     </div>
                 ))}

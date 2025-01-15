@@ -45,29 +45,37 @@ import express from 'express';
         formatError: (formattedError) => {
             // Return a different error message
             if (
-              formattedError?.extensions?.code ===
-              ApolloServerErrorCode.GRAPHQL_VALIDATION_FAILED
+                formattedError?.extensions?.code === ApolloServerErrorCode.GRAPHQL_VALIDATION_FAILED
             ) {
-              return {
-                ...formattedError,
-                message: "Your query doesn't match the schema. Try double-checking it!",
-              };
+                return {
+                    ...formattedError,
+                    message: "Your query doesn't match the schema. Try double-checking it!"
+                };
+            }
+
+            if (formattedError?.extensions?.code === Errors.LLM_RESPONSE_PARSE_ERROR) {
+                return {
+                    ...formattedError,
+                    message: 'The AI had trouble with that one. Please try again!'
+                };
             }
 
             if (
-                formattedError?.extensions?.code ===
-                Errors.LLM_RESPONSE_PARSE_ERROR
-              ) {
+                [
+                    Errors.LLM_API_ERROR,
+                    Errors.IMAGE_GEN_API_ERROR,
+                    Errors.MONGO_DB_ERROR,
+                    Errors.PINECONE_ERROR
+                ].includes(formattedError?.extensions?.code as Errors)
+            ) {
                 return {
-                  ...formattedError,
-                  message: "The AI had trouble with that one. Please try again!",
+                    ...formattedError,
+                    message: 'Something went wrong on our end. Please try again later.'
                 };
-              }
-        
-            // Otherwise return the formatted error. This error can also
-            // be manipulated in other ways, as long as it's returned.
+            }
+
             return formattedError;
-          },
+        }
     });
 
     mongoose.connect('mongodb://127.0.0.1:27017/test');

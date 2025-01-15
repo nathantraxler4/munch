@@ -49,17 +49,20 @@ function _extractRecipe(html: string) {
 
 async function scrapeRecipes() {
     mongoose.connect('mongodb://127.0.0.1:27017/test');
-    
-    
+
     const savedRecipes = await ScrapedRecipeModel.find({});
-    const savedLinks = savedRecipes.map(sr => sr.url);
+    const savedLinks = savedRecipes.map((sr) => sr.url);
     let frontierLinks: string[] = [];
     const visitedLinks = new Set<string>(savedLinks);
 
     let i = savedLinks.length - 1;
     while (frontierLinks.length < 10) {
         const oldLink = savedLinks[i];
-        const [, updatedFrontierLinks] = await getHTMLAndUpdateFrontierLinks(oldLink, frontierLinks, visitedLinks);
+        const [, updatedFrontierLinks] = await getHTMLAndUpdateFrontierLinks(
+            oldLink,
+            frontierLinks,
+            visitedLinks
+        );
         frontierLinks = updatedFrontierLinks;
         i--;
     }
@@ -67,9 +70,17 @@ async function scrapeRecipes() {
     let count = 0;
     while (frontierLinks.length > 0) {
         try {
-            if (count % 10 == 0) logger.info({ numLinksInQueue: frontierLinks.length, numVisitedLinks: visitedLinks.size });
+            if (count % 10 == 0)
+                logger.info({
+                    numLinksInQueue: frontierLinks.length,
+                    numVisitedLinks: visitedLinks.size
+                });
             const link = frontierLinks.shift() ?? '';
-            const [html, updatedFrontierLinks] = await getHTMLAndUpdateFrontierLinks(link, frontierLinks, visitedLinks);
+            const [html, updatedFrontierLinks] = await getHTMLAndUpdateFrontierLinks(
+                link,
+                frontierLinks,
+                visitedLinks
+            );
             frontierLinks = updatedFrontierLinks;
             const recipe = _extractRecipe(html);
             recipe.url = link;
@@ -90,7 +101,11 @@ async function scrapeRecipes() {
     logger.info('Completed scrapping!');
 }
 
-async function getHTMLAndUpdateFrontierLinks(link: string, frontierLinks: string[], visitedLinks: Set<string>) {
+async function getHTMLAndUpdateFrontierLinks(
+    link: string,
+    frontierLinks: string[],
+    visitedLinks: Set<string>
+) {
     let htmlData;
     try {
         const { data: html } = await axios.get(link);
@@ -119,5 +134,3 @@ async function getHTMLAndUpdateFrontierLinks(link: string, frontierLinks: string
         }
     }
 })();
-
-

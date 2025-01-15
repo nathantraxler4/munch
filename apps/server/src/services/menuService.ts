@@ -33,7 +33,7 @@ export async function getMenus() {
 /**
  * Service method used to generate a Menu based on a prompt.
  */
-export async function generateMenuFromPrompt(prompt: string) /*: Promise<Menu>*/ {
+export async function generateMenuFromPrompt(prompt: string): Promise<Menu> {
     logger.info('Generating menu from prompt.', { prompt });
     const index: Index = pc.index<PineconeMetaData>(INDEX_NAME, INDEX_HOST);
     const recipesCompletion = await _generatePotentialRecipes(prompt);
@@ -188,7 +188,12 @@ function _extractJsonArrayFromCompletion(
     return descriptions;
 }
 
-function _constructMenu(names: string[], descriptions: string[], urls: string[], imageUrl: string): Menu {
+function _constructMenu(
+    names: string[],
+    descriptions: string[],
+    urls: string[],
+    imageUrl: string
+): Menu {
     if (descriptions.length != names.length) {
         logAndThrowError({
             message: 'LLM did not respond with appropriate number of recipe descriptions.',
