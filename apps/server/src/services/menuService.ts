@@ -48,7 +48,10 @@ export async function generateMenuFromPrompt(prompt: string): Promise<Menu> {
     return menu;
 }
 
-async function fetchMostSimilarRecipesFromPinecone(index: Index, recipe: string | Recipe) {
+async function fetchMostSimilarRecipesFromPinecone(
+    index: Index,
+    recipe: string | Recipe
+): Promise<PineconeMetaData[]> {
     if (typeof recipe == 'object') recipe = JSON.stringify(recipe);
     const vector = await getEmbedding(recipe);
     const queryResponse = await queryPinecone(index, vector);

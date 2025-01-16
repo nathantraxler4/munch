@@ -72,6 +72,11 @@ export type RecipeInput = {
     url: Scalars['String']['input'];
 };
 
+export type Subscription = {
+    __typename?: 'Subscription';
+    time?: Maybe<Scalars['String']['output']>;
+};
+
 export type ResolverTypeWrapper<T> = Promise<T> | T;
 
 export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
@@ -164,6 +169,7 @@ export type ResolversTypes = {
     Recipe: ResolverTypeWrapper<Recipe>;
     RecipeInput: RecipeInput;
     String: ResolverTypeWrapper<Scalars['String']['output']>;
+    Subscription: ResolverTypeWrapper<{}>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -176,6 +182,7 @@ export type ResolversParentTypes = {
     Recipe: Recipe;
     RecipeInput: RecipeInput;
     String: Scalars['String']['output'];
+    Subscription: {};
 };
 
 export type CourseResolvers<
@@ -239,10 +246,18 @@ export type RecipeResolvers<
     __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type SubscriptionResolvers<
+    ContextType = any,
+    ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']
+> = {
+    time?: SubscriptionResolver<Maybe<ResolversTypes['String']>, 'time', ParentType, ContextType>;
+};
+
 export type Resolvers<ContextType = any> = {
     Course?: CourseResolvers<ContextType>;
     Menu?: MenuResolvers<ContextType>;
     Mutation?: MutationResolvers<ContextType>;
     Query?: QueryResolvers<ContextType>;
     Recipe?: RecipeResolvers<ContextType>;
+    Subscription?: SubscriptionResolvers<ContextType>;
 };

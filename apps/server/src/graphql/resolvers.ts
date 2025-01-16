@@ -16,6 +16,16 @@ const resolvers: Resolvers = {
             const menu = await menuService.generateMenuFromPrompt(args.prompt);
             return menu;
         }
+    },
+    Subscription: {
+        time: {
+            subscribe: async function* () {
+                while (true) {
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
+                    yield { time: new Date().toISOString() };
+                }
+            }
+        }
     }
 };
 

@@ -32,3 +32,7 @@ type Mutation {
     addRecipes(recipes: [RecipeInput!]!): [Recipe!]!
     generateMenuFromPrompt(prompt: String!): Menu!
 }
+
+type Subscription {
+    time: String
+}
