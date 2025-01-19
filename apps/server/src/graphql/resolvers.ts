@@ -18,15 +18,29 @@ const resolvers: Resolvers = {
         }
     },
     Subscription: {
-        time: {
-            subscribe: async function* () {
-                while (true) {
-                    await new Promise((resolve) => setTimeout(resolve, 1000));
-                    yield { time: new Date().toISOString() };
+        generateMenuFromPrompt: {
+          subscribe: async function* (_parent, args) {
+            const { prompt } = args;            
+            for await (const partialResult of menuService.generateMenuFromPromptStream(prompt)) {
+                if (typeof partialResult === 'string') {
+                    yield { 
+                        generateMenuFromPrompt: {
+                            backgroundImage: partialResult
+                        }
+                    };
+                } else {
+                    yield { 
+                        generateMenuFromPrompt: {
+                            courses: partialResult
+                        }
+                    };
                 }
             }
+          }
         }
     }
 };
+    
+
 
 export default resolvers;

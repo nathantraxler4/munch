@@ -94,7 +94,16 @@ import { useServer } from 'graphql-ws/lib/use/ws';
         path: graphqlPath // <— same path as HTTP
     });
 
-    const serverCleanup = useServer({ schema }, wsServer);
+    const serverCleanup = useServer({ 
+        schema, 
+        onError: (ctx, message, errors) => {
+            logger.error('Reached onError', errors);
+            return errors;
+        },
+        onConnect: () => {
+            logger.info('Connected!');
+        },
+    }, wsServer);
 
     server.addPlugin({
         async serverWillStart() {

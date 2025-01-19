@@ -15,6 +15,17 @@ type Course {
     url: String!
 }
 
+type Error {
+    message: String!
+    code: String!
+}
+
+type PartialMenu {
+    courses: [Course!]
+    backgroundImage: String
+    error: Error
+}
+
 input RecipeInput {
     name: String!
     ingredients: String!
@@ -34,5 +45,5 @@ type Mutation {
 }
 
 type Subscription {
-    time: String
+    generateMenuFromPrompt(prompt: String!): PartialMenu
 }

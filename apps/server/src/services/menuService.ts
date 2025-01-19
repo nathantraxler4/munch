@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import type { Nullable, PineconeMetaData } from '../types';
 
-import { Menu, Recipe, RecipeInput } from '../__generated__/types';
+import { Course, Menu, Recipe, RecipeInput } from '../__generated__/types';
 import openai from '../setup/openai';
 import { Errors, logAndThrowError } from '../utils/errors';
 import MenuModel from '../models/menu';
@@ -46,6 +46,26 @@ export async function generateMenuFromPrompt(prompt: string): Promise<Menu> {
     const recipes = await Promise.all(promises);
     const menu = generateMenu(recipes.flat());
     return menu;
+}
+
+/**
+ *
+ */
+export async function* generateMenuFromPromptStream(prompt: string): AsyncGenerator<string | Course[], void, unknown> {
+    logger.info('Generating menu from prompt.', { prompt });
+    const index: Index = pc.index<PineconeMetaData>(INDEX_NAME, INDEX_HOST);
+    const recipesCompletion = await _generatePotentialRecipes(prompt);
+    const generatedRecipes = _extractJsonArrayFromCompletion(recipesCompletion);
+    logger.info('Generated recipes completion.', { recipesCompletion });
+    const promises = [];
+    for (const recipe of generatedRecipes) {
+        promises.push(fetchMostSimilarRecipesFromPinecone(index, recipe));
+    }
+    const recipes = await Promise.all(promises);
+    for await (const partialResult of generateMenuStream(recipes.flat())) {
+        yield partialResult;
+    }
+
 }
 
 async function fetchMostSimilarRecipesFromPinecone(
@@ -137,6 +157,26 @@ export async function generateMenu(recipes: RecipeInput[] | PineconeMetaData[]):
     return menu;
 }
 
+/**
+ * Service method used to generate a Menu based on an array of Recipes.
+ */
+export async function* generateMenuStream(recipes: RecipeInput[] | PineconeMetaData[]): AsyncGenerator<string | Course[], void, unknown> {
+    logger.info('Generating menu from recipes.', { recipes });
+    const completion = await _generateDescriptions(recipes);
+    const descriptions = _extractJsonArrayFromCompletion(completion);
+    const names = recipes.map((r) => r.name);
+    const urls = recipes.map((r) => r.url);
+    const courses = _constructCourses(names, descriptions, urls);
+    yield courses;
+    const imageGenPromptCompletion = await _generateImageGenPrompt(recipes);
+    const imageGenPrompt = _getContentFromCompletion(imageGenPromptCompletion);
+    const imageResponse = await _generateBackgroundImage(imageGenPrompt);
+    const imageUrl = imageResponse.data[0].url || ''; // TO DO: Add more robust error handling
+    const menu = { courses, backgroundImage: imageUrl };
+    await insertMenus([menu]);
+    yield imageUrl;
+}
+
 function _getContentFromCompletion(
     completion: Nullable<
         OpenAI.Chat.Completions.ChatCompletion & {
@@ -191,6 +231,17 @@ function _extractJsonArrayFromCompletion(
     return descriptions;
 }
 
+function _constructCourses(names: string[], descriptions: string[], urls: string[]): Course[] {
+    const courses = descriptions.map((content: string, i: number) => {
+        return {
+            name: names[i],
+            description: content,
+            url: urls[i]
+        };
+    });
+    return courses;
+}
+
 function _constructMenu(
     names: string[],
     descriptions: string[],
@@ -204,13 +255,7 @@ function _constructMenu(
         });
     }
 
-    const courses = descriptions.map((content: string, i: number) => {
-        return {
-            name: names[i],
-            description: content,
-            url: urls[i]
-        };
-    });
+    const courses = _constructCourses(names, descriptions, urls);
 
     const menu = {
         courses: courses,
