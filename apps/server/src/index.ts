@@ -91,15 +91,11 @@ import { useServer } from 'graphql-ws/lib/use/ws';
 
     const wsServer = new WebSocketServer({
         server: httpServer,
-        path: graphqlPath // <— same path as HTTP
+        path: graphqlPath
     });
 
     const serverCleanup = useServer({ 
         schema, 
-        onError: (ctx, message, errors) => {
-            logger.error('Reached onError', errors);
-            return errors;
-        },
         onConnect: () => {
             logger.info('Connected!');
         },

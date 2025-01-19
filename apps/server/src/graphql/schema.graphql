@@ -23,8 +23,9 @@ type Error {
 type PartialMenu {
     courses: [Course!]
     backgroundImage: String
-    error: Error
 }
+
+union MenuStream = PartialMenu | Error
 
 input RecipeInput {
     name: String!
@@ -45,5 +46,5 @@ type Mutation {
 }
 
 type Subscription {
-    generateMenuFromPrompt(prompt: String!): PartialMenu
+    generateMenuFromPrompt(prompt: String!): MenuStream
 }
