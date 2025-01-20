@@ -51,7 +51,9 @@ export async function generateMenuFromPrompt(prompt: string): Promise<Menu> {
 /**
  *
  */
-export async function* generateMenuFromPromptStream(prompt: string): AsyncGenerator<string | Course[], void, unknown> {
+export async function* generateMenuFromPromptStream(
+    prompt: string
+): AsyncGenerator<string | Course[], void, unknown> {
     logger.info('Generating menu from prompt.', { prompt });
     const index: Index = pc.index<PineconeMetaData>(INDEX_NAME, INDEX_HOST);
     const recipesCompletion = await _generatePotentialRecipes(prompt);
@@ -65,7 +67,6 @@ export async function* generateMenuFromPromptStream(prompt: string): AsyncGenera
     for await (const partialResult of generateMenuStream(recipes.flat())) {
         yield partialResult;
     }
-
 }
 
 async function fetchMostSimilarRecipesFromPinecone(
@@ -160,7 +161,9 @@ export async function generateMenu(recipes: RecipeInput[] | PineconeMetaData[]):
 /**
  * Service method used to generate a Menu based on an array of Recipes.
  */
-export async function* generateMenuStream(recipes: RecipeInput[] | PineconeMetaData[]): AsyncGenerator<string | Course[], void, unknown> {
+export async function* generateMenuStream(
+    recipes: RecipeInput[] | PineconeMetaData[]
+): AsyncGenerator<string | Course[], void, unknown> {
     logger.info('Generating menu from recipes.', { recipes });
     const completion = await _generateDescriptions(recipes);
     const descriptions = _extractJsonArrayFromCompletion(completion);

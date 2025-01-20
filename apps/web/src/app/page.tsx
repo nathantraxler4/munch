@@ -6,11 +6,12 @@ import { MenuDisplay } from '../components/MenuDisplay';
 import { PromptForm } from '../components/PromptForm';
 import { GENERATE_MENU_FROM_PROMPT_STREAM } from '../graphql/mutations';
 import { Spinner } from '../components/Spinner';
+import { StreamError } from '../../../server/src/__generated__/types'; //__generated__/types';
 
 const emptyMenu = {
     courses: [],
     backgroundImage: ''
-}
+};
 
 /**
  *
@@ -18,39 +19,47 @@ const emptyMenu = {
 export default function Home() {
     const [userInput, setUserInput] = useState('');
     const [shouldSubscribe, setShouldSubscribe] = useState(false);
-    const [menu, setMenu] = useState(emptyMenu)
+    const [menu, setMenu] = useState(emptyMenu);
+    const [subscriptionError, setSubscriptionError] = useState<StreamError | null>(null);
+    let errorMessage = subscriptionError?.message;
 
-    const { data, error, loading } = useSubscription(
-            GENERATE_MENU_FROM_PROMPT_STREAM,
-            { 
-                variables: { prompt: userInput },
-                skip: !shouldSubscribe
-            }
-          );
+    // eslint-disable-next-line prefer-const
+    let { data, error, loading } = useSubscription(GENERATE_MENU_FROM_PROMPT_STREAM, {
+        variables: { prompt: userInput },
+        skip: !shouldSubscribe
+    });
 
-  useEffect(() => {
-    if (!data?.generateMenuFromPrompt) return;
-    const partialMenu = data.generateMenuFromPrompt
-
-    if (partialMenu.courses && partialMenu.courses.length > 0) {
-      setMenu(prev => ({
-        ...prev,
-        courses: partialMenu.courses,
-      }));
+    if (error) {
+        errorMessage = error.message;
     }
 
-    if (partialMenu.backgroundImage) {
-      setMenu(prev => ({
-        ...prev,
-        backgroundImage: partialMenu.backgroundImage,
-      }));
-      
-      setShouldSubscribe(false);
-    }
-    
-    // TODO
-    // if (data.generateMenuFromPrompt.error) { ... }
-  }, [data]);
+    useEffect(() => {
+        if (!data?.generateMenuFromPrompt) return;
+        const menuStream = data.generateMenuFromPrompt;
+
+        if (menuStream.__typename === 'StreamError') {
+            setSubscriptionError(menuStream);
+            setMenu({ ...emptyMenu });
+            setShouldSubscribe(false);
+            return;
+        }
+
+        if (menuStream.courses && menuStream.courses.length > 0) {
+            setMenu((prev) => ({
+                ...prev,
+                courses: menuStream.courses
+            }));
+        }
+
+        if (menuStream.backgroundImage) {
+            setMenu((prev) => ({
+                ...prev,
+                backgroundImage: menuStream.backgroundImage
+            }));
+
+            setShouldSubscribe(false);
+        }
+    }, [data]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setUserInput(event.target.value);
@@ -59,8 +68,8 @@ export default function Home() {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (userInput) {
-            setMenu( {...emptyMenu })
-            setShouldSubscribe(true)
+            setMenu({ ...emptyMenu });
+            setShouldSubscribe(true);
         }
     };
 
@@ -71,12 +80,10 @@ export default function Home() {
             <div className="flex-1 flex flex-col justify-center items-center gap-8 p-24 pb-24 sm:p-4 overflow-y-auto">
                 {loading ? (
                     <Spinner />
-                ) : error ? (
-                    <div className="text-red-500 text-lg">{error.message}</div>
+                ) : errorMessage ? (
+                    <div className="text-red-500 text-lg">{errorMessage}</div>
                 ) : (
-                    menu && (
-                        <MenuDisplay menu={menu} />
-                    )
+                    menu && <MenuDisplay menu={menu} />
                 )}
             </div>
 

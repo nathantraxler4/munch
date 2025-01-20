@@ -15,7 +15,7 @@ type Course {
     url: String!
 }
 
-type Error {
+type StreamError {
     message: String!
     code: String!
 }
@@ -25,7 +25,7 @@ type PartialMenu {
     backgroundImage: String
 }
 
-union MenuStream = PartialMenu | Error
+union MenuStream = PartialMenu | StreamError
 
 input RecipeInput {
     name: String!

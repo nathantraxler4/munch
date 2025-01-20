@@ -25,6 +25,10 @@ export const GENERATE_MENU_FROM_PROMPT_STREAM = gql`
                     url
                 }
             }
+            ... on StreamError {
+                message
+                code
+            }
         }
     }
-`
+`;
