@@ -1,19 +1,56 @@
 'use client';
 
-import { useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { useEffect, useState } from 'react';
+import { useSubscription } from '@apollo/client';
 import { MenuDisplay } from '../components/MenuDisplay';
 import { PromptForm } from '../components/PromptForm';
-import { GENERATE_MENU_FROM_PROMPT } from '../graphql/mutations';
+import { GENERATE_MENU_FROM_PROMPT_STREAM } from '../graphql/mutations';
 import { Spinner } from '../components/Spinner';
+
+const emptyMenu = {
+    courses: [],
+    backgroundImage: ''
+}
 
 /**
  *
  */
 export default function Home() {
     const [userInput, setUserInput] = useState('');
-    const [generateMenuFromPrompt, { data, loading, error }] =
-        useMutation(GENERATE_MENU_FROM_PROMPT);
+    const [shouldSubscribe, setShouldSubscribe] = useState(false);
+    const [menu, setMenu] = useState(emptyMenu)
+
+    const { data, error, loading } = useSubscription(
+            GENERATE_MENU_FROM_PROMPT_STREAM,
+            { 
+                variables: { prompt: userInput },
+                skip: !shouldSubscribe
+            }
+          );
+
+  useEffect(() => {
+    if (!data?.generateMenuFromPrompt) return;
+    const partialMenu = data.generateMenuFromPrompt
+
+    if (partialMenu.courses && partialMenu.courses.length > 0) {
+      setMenu(prev => ({
+        ...prev,
+        courses: partialMenu.courses,
+      }));
+    }
+
+    if (partialMenu.backgroundImage) {
+      setMenu(prev => ({
+        ...prev,
+        backgroundImage: partialMenu.backgroundImage,
+      }));
+      
+      setShouldSubscribe(false);
+    }
+    
+    // TODO
+    // if (data.generateMenuFromPrompt.error) { ... }
+  }, [data]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setUserInput(event.target.value);
@@ -21,9 +58,10 @@ export default function Home() {
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log('User input:', userInput);
-
-        generateMenuFromPrompt({ variables: { prompt: userInput } });
+        if (userInput) {
+            setMenu( {...emptyMenu })
+            setShouldSubscribe(true)
+        }
     };
 
     return (
@@ -36,8 +74,8 @@ export default function Home() {
                 ) : error ? (
                     <div className="text-red-500 text-lg">{error.message}</div>
                 ) : (
-                    data?.generateMenuFromPrompt && (
-                        <MenuDisplay menu={data.generateMenuFromPrompt} />
+                    menu && (
+                        <MenuDisplay menu={menu} />
                     )
                 )}
             </div>
