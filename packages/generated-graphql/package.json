@@ -1,0 +1,8 @@
+{
+    "name": "generated-graphql",
+    "main": "src/types.ts",
+    "types": "src/types.ts",
+    "dependencies": {
+      "typescript": "latest"
+    }
+  }

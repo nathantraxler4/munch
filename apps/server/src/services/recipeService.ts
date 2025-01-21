@@ -1,4 +1,4 @@
-import { Recipe, RecipeInput } from '../__generated__/types';
+import { Recipe, RecipeInput } from 'generated-graphql';
 import RecipeModel from '../models/recipe';
 import logger from '../utils/logger';
 

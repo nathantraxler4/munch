@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import type { Nullable, PineconeMetaData } from '../types';
 
-import { Course, Menu, Recipe, RecipeInput } from '../__generated__/types';
+import { Course, Menu, Recipe, RecipeInput } from 'generated-graphql';
 import openai from '../setup/openai';
 import { Errors, logAndThrowError } from '../utils/errors';
 import MenuModel from '../models/menu';

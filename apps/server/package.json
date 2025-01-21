@@ -18,6 +18,7 @@
     "license": "ISC",
     "description": "",
     "dependencies": {
+        "generated-graphql": "*",
         "@apollo/server": "^4.11.0",
         "@graphql-tools/schema": "^10.0.16",
         "@pinecone-database/pinecone": "^4.0.0",

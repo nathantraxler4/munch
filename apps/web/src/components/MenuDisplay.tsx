@@ -1,4 +1,4 @@
-import { Menu } from '../../../server/src/__generated__/types';
+import { Menu } from 'generated-graphql';
 
 interface MenuDisplayProps {
     menu: Menu;

@@ -10,6 +10,7 @@
         "check-types": "tsc --noEmit"
     },
     "dependencies": {
+        "generated-graphql": "*",
         "@apollo/client": "^3.12.6",
         "next": "15.1.4",
         "react": "^19.0.0",
