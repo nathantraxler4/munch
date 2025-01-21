@@ -6,7 +6,7 @@ const tseslint = require('typescript-eslint');
 const jsdoc = require('eslint-plugin-jsdoc');
 
 module.exports = [
-    { ignores: ['apps/server/dist/', 'apps/web/.next'] },
+    { ignores: ['apps/server/dist/', 'apps/web/.next', 'packages/generated-graphql/src/types.ts'] },
     { files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'] },
     { languageOptions: { globals: globals.browser } },
     {

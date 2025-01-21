@@ -11,7 +11,9 @@ export function MenuDisplay({ menu }: MenuDisplayProps) {
     return (
         <div
             className={`w-full max-w-5xl aspect-square rounded-md p-4 text-white relative ${
-                !menu.backgroundImage ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-gradient bg-[length:200%_100%]' : ''
+                !menu.backgroundImage
+                    ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-gradient bg-[length:200%_100%]'
+                    : ''
             }`}
             style={{
                 ...(menu.backgroundImage && {

@@ -3,6 +3,6 @@
     "main": "src/types.ts",
     "types": "src/types.ts",
     "dependencies": {
-      "typescript": "latest"
+        "typescript": "latest"
     }
-  }
+}
