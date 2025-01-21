@@ -6,7 +6,7 @@ import { MenuDisplay } from '../components/MenuDisplay';
 import { PromptForm } from '../components/PromptForm';
 import { GENERATE_MENU_FROM_PROMPT_STREAM } from '../graphql/mutations';
 import { Spinner } from '../components/Spinner';
-import { StreamError } from '../../../server/src/__generated__/types'; //__generated__/types';
+import { StreamError } from '../../../server/src/__generated__/types';
 
 const emptyMenu = {
     courses: [],
@@ -88,7 +88,7 @@ export default function Home() {
         if (errorMessage) {
             return <div className="text-red-500 text-lg">{errorMessage}</div>;
         }
-        if (menu) {
+        if (menu?.courses.length > 0 || menu.backgroundImage) {
             return <MenuDisplay menu={menu} />;
         }
         return null;
