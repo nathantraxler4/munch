@@ -10,14 +10,18 @@ interface MenuDisplayProps {
 export function MenuDisplay({ menu }: MenuDisplayProps) {
     return (
         <div
-            className="w-full max-w-2xl aspect-[4/7] rounded-md p-4 text-white relative"
+            className={`w-full max-w-5xl aspect-square rounded-md p-4 text-white relative ${
+                !menu.backgroundImage ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-gradient bg-[length:200%_100%]' : ''
+            }`}
             style={{
-                backgroundImage: `url(${menu.backgroundImage})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
+                ...(menu.backgroundImage && {
+                    backgroundImage: `url(${menu.backgroundImage})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                })
             }}
         >
-            <div className="relative">
+            <div className="flex flex-col justify-center h-full">
                 {menu.courses.map((course, index) => (
                     <div
                         key={index}
