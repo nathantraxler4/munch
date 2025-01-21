@@ -33,6 +33,14 @@ export default function Home() {
         errorMessage = error.message;
     }
 
+    // Reset any previous errors when a new subscription is started.
+    useEffect(() => {
+        if (shouldSubscribe) {
+            setSubscriptionError(null);
+            setMenu(emptyMenu);
+        }
+    }, [shouldSubscribe]);
+
     useEffect(() => {
         if (!data?.generateMenuFromPrompt) return;
         const menuStream = data.generateMenuFromPrompt;
@@ -73,18 +81,25 @@ export default function Home() {
         }
     };
 
+    function renderContent() {
+        if (loading) {
+            return <Spinner />;
+        }
+        if (errorMessage) {
+            return <div className="text-red-500 text-lg">{errorMessage}</div>;
+        }
+        if (menu) {
+            return <MenuDisplay menu={menu} />;
+        }
+        return null;
+    }
+
     return (
         <div className="flex flex-col min-h-screen bg-slate-800">
             <div className="p-4 text-white text-2xl font-bold">Munch</div>
 
-            <div className="flex-1 flex flex-col justify-center items-center gap-8 p-24 sm:p-4 sm:pb-36 overflow-y-auto">
-                {loading ? (
-                    <Spinner />
-                ) : errorMessage ? (
-                    <div className="text-red-500 text-lg">{errorMessage}</div>
-                ) : (
-                    menu && <MenuDisplay menu={menu} />
-                )}
+            <div className="flex-1 flex flex-col justify-center items-center gap-8 p-24 sm:p-4 sm:pb-32 overflow-y-auto">
+                {renderContent()}
             </div>
 
             <PromptForm
