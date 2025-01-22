@@ -8,9 +8,6 @@ interface PromptFormProps {
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 }
 
-/**
- *
- */
 export function PromptForm({ className, userInput, onInputChange, onSubmit }: PromptFormProps) {
     return (
         <div className={`${className} pb-12 px-24 sm:px-4 flex justify-center bg-slate-800 w-full`}>

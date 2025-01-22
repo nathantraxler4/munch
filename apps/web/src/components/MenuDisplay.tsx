@@ -4,9 +4,6 @@ interface MenuDisplayProps {
     menu: Menu;
 }
 
-/**
- *
- */
 export function MenuDisplay({ menu }: MenuDisplayProps) {
     return (
         <div

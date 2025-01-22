@@ -3,20 +3,11 @@
 const globals = require('globals');
 const pluginJs = require('@eslint/js');
 const tseslint = require('typescript-eslint');
-const jsdoc = require('eslint-plugin-jsdoc');
 
 module.exports = [
     { ignores: ['apps/server/dist/', 'apps/web/.next', 'packages/generated-graphql/src/types.ts'] },
     { files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'] },
     { languageOptions: { globals: globals.browser } },
-    {
-        plugins: {
-            jsdoc
-        },
-        rules: {
-            'jsdoc/require-jsdoc': ['error', { publicOnly: true }]
-        }
-    },
     {
         rules: {
             'no-unused-vars': 'warn',

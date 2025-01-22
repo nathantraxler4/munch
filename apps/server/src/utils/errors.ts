@@ -9,9 +9,6 @@ export enum Errors {
     PINECONE_ERROR = 'PINECONE_ERROR'
 }
 
-/**
- *
- */
 export function logAndThrowError({
     message,
     error,
@@ -27,9 +24,6 @@ export function logAndThrowError({
     throw new GraphQLError(errorMessage, { extensions: { code } });
 }
 
-/**
- *
- */
 export function formatError(error: GraphQLFormattedError) {
     // Custom error formatting
     if (error?.extensions?.code === 'GRAPHQL_VALIDATION_FAILED') {

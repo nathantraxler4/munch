@@ -2,9 +2,6 @@ import { Recipe, RecipeInput } from 'generated-graphql';
 import RecipeModel from '../models/recipe';
 import logger from '../utils/logger';
 
-/**
- *
- */
 export async function getRecipes(): Promise<Recipe[]> {
     let recipes;
     try {
@@ -16,9 +13,6 @@ export async function getRecipes(): Promise<Recipe[]> {
     return recipes;
 }
 
-/**
- *
- */
 export async function addRecipes(recipes: RecipeInput[]): Promise<Recipe[]> {
     let insertedRecipes;
     try {

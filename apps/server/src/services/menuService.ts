@@ -34,9 +34,6 @@ const INDEX_NAME = 'recipes';
 const INDEX_HOST = 'https://recipes-xx1tt13.svc.aped-4627-b74a.pinecone.io';
 const EMBEDDING_MODEL = 'multilingual-e5-large';
 
-/**
- *
- */
 export async function getMenus() {
     logger.info('Getting menus');
     let menus;
@@ -50,9 +47,6 @@ export async function getMenus() {
     return menus;
 }
 
-/**
- * Service method used to generate a Menu based on a prompt.
- */
 export async function generateMenuFromPrompt(prompt: string): Promise<Menu> {
     logger.info('Generating menu from prompt.', { prompt });
     const index: Index = pc.index<PineconeMetaData>(INDEX_NAME, INDEX_HOST);
@@ -67,9 +61,6 @@ export async function generateMenuFromPrompt(prompt: string): Promise<Menu> {
     return menu;
 }
 
-/**
- * This is the top level service method used to generate a menu from a prompt.
- */
 export async function* generateMenuFromPromptStream(
     prompt: string
 ): AsyncGenerator<string | Course[], void, unknown> {
@@ -156,9 +147,6 @@ async function getEmbedding(prompt: string): Promise<number[]> {
     }
 }
 
-/**
- * Service method used to generate a Menu based on an array of Recipes.
- */
 export async function generateMenu(recipes: RecipeInput[] | PineconeMetaData[]): Promise<Menu> {
     logger.info('Generating menu from recipes.', { recipes });
     const imageGenPromptCompletion = await _generateImageGenPrompt(recipes);
@@ -175,9 +163,6 @@ export async function generateMenu(recipes: RecipeInput[] | PineconeMetaData[]):
     return menu;
 }
 
-/**
- * Service method used to generate a Menu Stream based on an array of Recipes.
- */
 export async function* generateMenuStream(
     recipes: RecipeInput[] | PineconeMetaData[]
 ): AsyncGenerator<string | Course[], void, unknown> {
@@ -248,9 +233,6 @@ function _constructMenu(
     return menu;
 }
 
-/**
- * Top level service method to insert menus
- */
 export async function insertMenus(menus: Menu[]) {
     logger.info('Inserting menus to DB', { menus });
     try {
