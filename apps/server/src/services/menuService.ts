@@ -9,6 +9,26 @@ import logger from '../utils/logger';
 import pc from '../setup/pinecone';
 import type { QueryResponse, EmbeddingsList, Index } from '@pinecone-database/pinecone';
 import { GraphQLError } from 'graphql';
+import { zodResponseFormat } from 'openai/helpers/zod';
+import { z } from 'zod';
+import { ParsedChatCompletion } from 'openai/resources/beta/chat/completions';
+
+const GeneratedRecipes = z.object({
+    recipes: z.array(
+        z.object({
+            name: z.string(),
+            ingredients: z.string(),
+            directions: z.string()
+        })
+    )
+});
+type GeneratedRecipesType = z.infer<typeof GeneratedRecipes>;
+
+const GeneratedDescriptions = z.object({
+    descriptions: z.array(z.string())
+});
+
+type GeneratedDescriptionsType = z.infer<typeof GeneratedDescriptions>;
 
 const INDEX_NAME = 'recipes';
 const INDEX_HOST = 'https://recipes-xx1tt13.svc.aped-4627-b74a.pinecone.io';
@@ -36,9 +56,8 @@ export async function getMenus() {
 export async function generateMenuFromPrompt(prompt: string): Promise<Menu> {
     logger.info('Generating menu from prompt.', { prompt });
     const index: Index = pc.index<PineconeMetaData>(INDEX_NAME, INDEX_HOST);
-    const recipesCompletion = await _generatePotentialRecipes(prompt);
-    const generatedRecipes = _extractJsonArrayFromCompletion(recipesCompletion);
-    logger.info('Generated recipes completion.', { recipesCompletion });
+    const generatedRecipes = await _generatePotentialRecipes(prompt);
+    logger.info('Generated recipes completion.', { generatedRecipes });
     const promises = [];
     for (const recipe of generatedRecipes) {
         promises.push(fetchMostSimilarRecipesFromPinecone(index, recipe));
@@ -49,16 +68,15 @@ export async function generateMenuFromPrompt(prompt: string): Promise<Menu> {
 }
 
 /**
- *
+ * This is the top level service method used to generate a menu from a prompt.
  */
 export async function* generateMenuFromPromptStream(
     prompt: string
 ): AsyncGenerator<string | Course[], void, unknown> {
     logger.info('Generating menu from prompt.', { prompt });
     const index: Index = pc.index<PineconeMetaData>(INDEX_NAME, INDEX_HOST);
-    const recipesCompletion = await _generatePotentialRecipes(prompt);
-    const generatedRecipes = _extractJsonArrayFromCompletion(recipesCompletion);
-    logger.info('Generated recipes completion.', { recipesCompletion });
+    const generatedRecipes = await _generatePotentialRecipes(prompt);
+    logger.info('Generated recipes:', { generatedRecipes });
     const promises = [];
     for (const recipe of generatedRecipes) {
         promises.push(fetchMostSimilarRecipesFromPinecone(index, recipe));
@@ -145,12 +163,11 @@ export async function generateMenu(recipes: RecipeInput[] | PineconeMetaData[]):
     logger.info('Generating menu from recipes.', { recipes });
     const imageGenPromptCompletion = await _generateImageGenPrompt(recipes);
     const imageGenPrompt = _getContentFromCompletion(imageGenPromptCompletion);
-    const [completion, imageResponse] = await Promise.all([
+    const [descriptions, imageResponse] = await Promise.all([
         _generateDescriptions(recipes),
         _generateBackgroundImage(imageGenPrompt)
     ]);
     const imageUrl = imageResponse.data[0].url || ''; // TO DO: Add more robust error handling
-    const descriptions = _extractJsonArrayFromCompletion(completion);
     const names = recipes.map((r) => r.name);
     const urls = recipes.map((r) => r.url);
     const menu = _constructMenu(names, descriptions, urls, imageUrl);
@@ -159,14 +176,13 @@ export async function generateMenu(recipes: RecipeInput[] | PineconeMetaData[]):
 }
 
 /**
- * Service method used to generate a Menu based on an array of Recipes.
+ * Service method used to generate a Menu Stream based on an array of Recipes.
  */
 export async function* generateMenuStream(
     recipes: RecipeInput[] | PineconeMetaData[]
 ): AsyncGenerator<string | Course[], void, unknown> {
     logger.info('Generating menu from recipes.', { recipes });
-    const completion = await _generateDescriptions(recipes);
-    const descriptions = _extractJsonArrayFromCompletion(completion);
+    const descriptions = await _generateDescriptions(recipes);
     const names = recipes.map((r) => r.name);
     const urls = recipes.map((r) => r.url);
     const courses = _constructCourses(names, descriptions, urls);
@@ -196,42 +212,6 @@ function _getContentFromCompletion(
 
     const content = completion.choices[0].message.content;
     return content;
-}
-
-function _extractJsonArrayFromCompletion(
-    completion: Nullable<
-        OpenAI.Chat.Completions.ChatCompletion & {
-            _request_id?: Nullable<string>;
-        }
-    >
-) {
-    const content = _getContentFromCompletion(completion);
-    // Locate JSON array indices
-    const jsonStartIndex = content.indexOf('[');
-    const jsonEndIndex = content.indexOf(']');
-
-    if (jsonStartIndex === -1 || jsonEndIndex === -1) {
-        logAndThrowError({
-            message: `Content does not contain a valid JSON array. Content received: "${content}"`,
-            code: Errors.LLM_RESPONSE_PARSE_ERROR
-        });
-    }
-
-    const jsonArrayString = content.substring(jsonStartIndex, jsonEndIndex + 1);
-
-    // Attempt to parse the JSON array
-    let descriptions;
-    try {
-        descriptions = JSON.parse(jsonArrayString);
-    } catch (error) {
-        logAndThrowError({
-            message: `Failed to parse LLM Response as JSON. Content received: "${jsonArrayString}"`,
-            error: error,
-            code: Errors.LLM_RESPONSE_PARSE_ERROR
-        });
-    }
-    logger.info('Response from LLM successfully parsed to an array!');
-    return descriptions;
 }
 
 function _constructCourses(names: string[], descriptions: string[], urls: string[]): Course[] {
@@ -310,7 +290,7 @@ async function _generateImageGenPrompt(recipes: RecipeInput[] | PineconeMetaData
 
 async function _generateDescriptions(recipes: RecipeInput[] | PineconeMetaData[]) {
     logger.info('Requesting LLM to generate descriptions...');
-    const completion = await invokeCompletionAPI({
+    const completion = await invokeStructuredCompletionAPI<GeneratedDescriptionsType>({
         model: process.env.GENERATE_RECIPE_MODEL ?? 'gpt-4o',
         messages: [
             {
@@ -327,14 +307,22 @@ async function _generateDescriptions(recipes: RecipeInput[] | PineconeMetaData[]
                 role: 'user',
                 content: JSON.stringify(recipes)
             }
-        ]
+        ],
+        response_format: zodResponseFormat(GeneratedDescriptions, 'generatedDescriptions')
     });
-    return completion;
+    if (!completion.choices[0].message.parsed) {
+        logAndThrowError({
+            message: 'Parsed message is nullish.',
+            code: Errors.LLM_API_ERROR
+        });
+    }
+
+    return completion.choices[0].message.parsed.descriptions;
 }
 
 async function _generatePotentialRecipes(prompt: string) {
     logger.info('Requesting LLM to generate recipes...');
-    const completion = await invokeCompletionAPI({
+    const completion = await invokeStructuredCompletionAPI<GeneratedRecipesType>({
         model: process.env.GENERATE_RECIPE_MODEL ?? 'gpt-4o',
         messages: [
             {
@@ -344,16 +332,23 @@ async function _generatePotentialRecipes(prompt: string) {
                         "name"
                         "ingredients"
                         "instructions"
-                    No other keys or text should be present. Do not include any commentary, explanations, or additional formatting outside of the JSON array.
+                    No other keys or text should be present. Do not include any commentary, explanations, or additional formatting outside of the JSON array. Be concise.
                 `
             },
             {
                 role: 'user',
                 content: prompt
             }
-        ]
+        ],
+        response_format: zodResponseFormat(GeneratedRecipes, 'generatedRecipes')
     });
-    return completion;
+    if (!completion.choices[0].message.parsed || !completion.choices[0].message.parsed.recipes) {
+        logAndThrowError({
+            message: 'Parsed message is nullish.',
+            code: Errors.LLM_API_ERROR
+        });
+    }
+    return completion.choices[0].message.parsed.recipes;
 }
 
 async function invokeCompletionAPI(
@@ -362,6 +357,38 @@ async function invokeCompletionAPI(
     let completion;
     try {
         completion = await openai.chat.completions.create(config);
+    } catch (error) {
+        logAndThrowError({
+            message: 'An error occurred requesting LLM API.',
+            error,
+            code: Errors.LLM_API_ERROR
+        });
+    }
+    return completion;
+}
+
+async function invokeStructuredCompletionAPI<T>(
+    config: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming
+): Promise<ParsedChatCompletion<T | null>> {
+    let completion;
+    try {
+        completion = await openai.beta.chat.completions.parse(config);
+        if (completion.choices[0].finish_reason === 'length') {
+            // Handle the case where the model did not return a complete response
+            logAndThrowError({
+                message: 'Model did not return a complete response.',
+                code: Errors.LLM_API_ERROR
+            });
+        }
+
+        const recipesResponse = completion.choices[0].message;
+
+        if (recipesResponse.refusal) {
+            logAndThrowError({
+                message: 'The LLM refused to answer that prompt.',
+                code: Errors.LLM_API_ERROR
+            });
+        }
     } catch (error) {
         logAndThrowError({
             message: 'An error occurred requesting LLM API.',

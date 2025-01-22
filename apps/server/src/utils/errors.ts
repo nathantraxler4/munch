@@ -23,6 +23,7 @@ export function logAndThrowError({
 }): never {
     const errorMessage = `${message}${error ? ` Error: ${error}` : ''}`;
     logger.error(errorMessage);
+    if (error) throw error;
     throw new GraphQLError(errorMessage, { extensions: { code } });
 }
 
