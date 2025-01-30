@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import type { Nullable, PineconeMetaData } from '../types';
+import type { PineconeMetaData } from '../types';
 
 import type { EmbeddingsList, Index, QueryResponse } from '@pinecone-database/pinecone';
 import { Course, Menu, Recipe, RecipeInput } from 'generated-graphql';
@@ -45,20 +45,6 @@ export async function getMenus() {
     }
     logger.info(`Fetched ${menus.length} menus from the DB.`);
     return menus;
-}
-
-export async function generateMenuFromPrompt(prompt: string): Promise<Menu> {
-    logger.info('Generating menu from prompt.', { prompt });
-    const index: Index = pc.index<PineconeMetaData>(INDEX_NAME, INDEX_HOST);
-    const generatedRecipes = await _generatePotentialRecipes(prompt);
-    logger.info('Generated recipes completion.', { generatedRecipes });
-    const promises = [];
-    for (const recipe of generatedRecipes) {
-        promises.push(fetchMostSimilarRecipesFromPinecone(index, recipe));
-    }
-    const recipes = await Promise.all(promises);
-    const menu = generateMenu(recipes.flat());
-    return menu;
 }
 
 export async function* generateMenuFromPromptStream(
@@ -147,22 +133,6 @@ async function getEmbedding(prompt: string): Promise<number[]> {
     }
 }
 
-export async function generateMenu(recipes: RecipeInput[] | PineconeMetaData[]): Promise<Menu> {
-    logger.info('Generating menu from recipes.', { recipes });
-    const imageGenPromptCompletion = await _generateImageGenPrompt(recipes);
-    const imageGenPrompt = _getContentFromCompletion(imageGenPromptCompletion);
-    const [descriptions, imageResponse] = await Promise.all([
-        _generateDescriptions(recipes),
-        _generateBackgroundImage(imageGenPrompt)
-    ]);
-    const imageUrl = imageResponse.data[0].url || ''; // TO DO: Add more robust error handling
-    const names = recipes.map((r) => r.name);
-    const urls = recipes.map((r) => r.url);
-    const menu = _constructMenu(names, descriptions, urls, imageUrl);
-    await insertMenus([menu]);
-    return menu;
-}
-
 export async function* generateMenuStream(
     recipes: RecipeInput[] | PineconeMetaData[]
 ): AsyncGenerator<string | Course[], void, unknown> {
@@ -181,13 +151,7 @@ export async function* generateMenuStream(
     yield imageUrl;
 }
 
-function _getContentFromCompletion(
-    completion: Nullable<
-        OpenAI.Chat.Completions.ChatCompletion & {
-            _request_id?: Nullable<string>;
-        }
-    >
-) {
+function _getContentFromCompletion(completion: OpenAI.Chat.Completions.ChatCompletion) {
     if (!completion?.choices?.[0]?.message?.content) {
         logAndThrowError({
             message: 'LLM response has no content.',
@@ -208,29 +172,6 @@ function _constructCourses(names: string[], descriptions: string[], urls: string
         };
     });
     return courses;
-}
-
-function _constructMenu(
-    names: string[],
-    descriptions: string[],
-    urls: string[],
-    imageUrl: string
-): Menu {
-    if (descriptions.length != names.length) {
-        logAndThrowError({
-            message: 'LLM did not respond with appropriate number of recipe descriptions.',
-            code: Errors.LLM_RESPONSE_PARSE_ERROR
-        });
-    }
-
-    const courses = _constructCourses(names, descriptions, urls);
-
-    const menu = {
-        courses: courses,
-        backgroundImage: imageUrl
-    };
-
-    return menu;
 }
 
 export async function insertMenus(menus: Menu[]) {
