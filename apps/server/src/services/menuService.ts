@@ -59,6 +59,7 @@ export async function* generateMenuFromPromptStream(
         promises.push(fetchMostSimilarRecipesFromPinecone(index, recipe));
     }
     const recipes = await Promise.all(promises);
+
     for await (const partialResult of generateMenuStream(recipes.flat())) {
         yield partialResult;
     }

@@ -7,17 +7,10 @@ import { formatError } from '../utils/errors';
 const resolvers: Resolvers = {
     Query: {
         recipes: async () => await recipeService.getRecipes(),
-        menus: async () => await menuService.getMenus(),
-        generateMenu: async (_parent, args) => {
-            return await menuService.generateMenu(args.recipes);
-        }
+        menus: async () => await menuService.getMenus()
     },
     Mutation: {
-        addRecipes: async (_parent, args) => await recipeService.addRecipes(args.recipes),
-        generateMenuFromPrompt: async (_parent, args) => {
-            const menu = await menuService.generateMenuFromPrompt(args.prompt);
-            return menu;
-        }
+        addRecipes: async (_parent, args) => await recipeService.addRecipes(args.recipes)
     },
     MenuStream: {
         __resolveType(obj: MenuStream) {
