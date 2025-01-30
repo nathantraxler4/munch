@@ -1,8 +1,8 @@
+import { MenuStream, Resolvers } from 'generated-graphql';
+import { GraphQLError } from 'graphql';
 import * as menuService from '../services/menuService';
 import * as recipeService from '../services/recipeService';
-import { MenuStream, Resolvers } from 'generated-graphql';
 import { formatError } from '../utils/errors';
-import { GraphQLError } from 'graphql';
 
 const resolvers: Resolvers = {
     Query: {

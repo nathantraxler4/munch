@@ -1,4 +1,4 @@
-import { prop, getModelForClass, modelOptions } from '@typegoose/typegoose';
+import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose';
 
 @modelOptions({ schemaOptions: { _id: false } })
 class Publisher {

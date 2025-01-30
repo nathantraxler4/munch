@@ -1,8 +1,8 @@
-import '../../src/setup/config';
-import { describe, test, expect, beforeEach, jest } from '@jest/globals';
-import * as menuService from '../../src/services/menuService';
-import openai from '../../src/setup/openai';
+import { beforeEach, describe, expect, jest, test } from '@jest/globals';
 import MenuModel from '../../src/models/menu';
+import * as menuService from '../../src/services/menuService';
+import '../../src/setup/config';
+import openai from '../../src/setup/openai';
 import { recipes } from '../mocks/recipes';
 
 // Mock the OpenAI client

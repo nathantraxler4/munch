@@ -1,5 +1,5 @@
-import winston from 'winston';
 import _ from 'lodash';
+import winston from 'winston';
 
 const { combine, timestamp, json, errors, colorize, printf } = winston.format;
 

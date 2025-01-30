@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useSubscription } from '@apollo/client';
+import { StreamError } from 'generated-graphql';
+import { useEffect, useState } from 'react';
 import { MenuDisplay } from '../components/MenuDisplay';
 import { PromptForm } from '../components/PromptForm';
-import { GENERATE_MENU_FROM_PROMPT_STREAM } from '../graphql/mutations';
 import { Spinner } from '../components/Spinner';
-import { StreamError } from 'generated-graphql';
+import { GENERATE_MENU_FROM_PROMPT_STREAM } from '../graphql/mutations';
 
 const emptyMenu = {
     courses: [],

@@ -1,8 +1,8 @@
-import ScrapedRecipeModel from '../src/models/scrapedRecipe';
-import logger from '../src/utils/logger';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import mongoose from 'mongoose';
+import ScrapedRecipeModel from '../src/models/scrapedRecipe';
+import logger from '../src/utils/logger';
 
 function _extractLinks(html: string) {
     const $ = cheerio.load(html);

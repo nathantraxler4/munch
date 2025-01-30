@@ -1,19 +1,19 @@
-import './setup/config';
-import { readFileSync } from 'fs';
 import { ApolloServer, ApolloServerPlugin } from '@apollo/server';
-import { formatError } from './utils/errors';
-import resolvers from './graphql/resolvers';
-import mongoose from 'mongoose';
-import logger from './utils/logger';
-import bodyParser from 'body-parser';
-import cors from 'cors';
 import { expressMiddleware } from '@apollo/server/express4';
-import express from 'express';
-import { createServer } from 'http';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { makeExecutableSchema } from '@graphql-tools/schema';
-import { WebSocketServer } from 'ws';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import express from 'express';
+import { readFileSync } from 'fs';
 import { useServer } from 'graphql-ws/lib/use/ws';
+import { createServer } from 'http';
+import mongoose from 'mongoose';
+import { WebSocketServer } from 'ws';
+import resolvers from './graphql/resolvers';
+import './setup/config';
+import { formatError } from './utils/errors';
+import logger from './utils/logger';
 
 (async () => {
     const graphqlPath = '/graphql';

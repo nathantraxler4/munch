@@ -1,17 +1,17 @@
 import OpenAI from 'openai';
 import type { Nullable, PineconeMetaData } from '../types';
 
+import type { EmbeddingsList, Index, QueryResponse } from '@pinecone-database/pinecone';
 import { Course, Menu, Recipe, RecipeInput } from 'generated-graphql';
-import openai from '../setup/openai';
-import { Errors, logAndThrowError } from '../utils/errors';
-import MenuModel from '../models/menu';
-import logger from '../utils/logger';
-import pc from '../setup/pinecone';
-import type { QueryResponse, EmbeddingsList, Index } from '@pinecone-database/pinecone';
 import { GraphQLError } from 'graphql';
 import { zodResponseFormat } from 'openai/helpers/zod';
-import { z } from 'zod';
 import { ParsedChatCompletion } from 'openai/resources/beta/chat/completions';
+import { z } from 'zod';
+import MenuModel from '../models/menu';
+import openai from '../setup/openai';
+import pc from '../setup/pinecone';
+import { Errors, logAndThrowError } from '../utils/errors';
+import logger from '../utils/logger';
 
 const GeneratedRecipes = z.object({
     recipes: z.array(

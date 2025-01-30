@@ -1,7 +1,7 @@
 'use client';
 
-import { Geist, Geist_Mono } from 'next/font/google';
 import { ApolloProvider } from '@apollo/client';
+import { Geist, Geist_Mono } from 'next/font/google';
 import client from '../lib/apolloClient';
 import './globals.css';
 

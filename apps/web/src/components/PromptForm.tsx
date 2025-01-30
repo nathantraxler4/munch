@@ -1,5 +1,5 @@
-import TextareaAutosize from 'react-textarea-autosize';
 import { FaArrowUp } from 'react-icons/fa';
+import TextareaAutosize from 'react-textarea-autosize';
 
 interface PromptFormProps {
     className: string;

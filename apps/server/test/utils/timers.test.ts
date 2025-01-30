@@ -1,6 +1,6 @@
-import { timedFunction, timedAsyncFunction } from '../../src/utils/timers';
+import { describe, expect, jest, test } from '@jest/globals';
 import logger from '../../src/utils/logger';
-import { describe, expect, test, jest } from '@jest/globals';
+import { timedAsyncFunction, timedFunction } from '../../src/utils/timers';
 
 // Mock the logger to test log outputs
 jest.mock('../../src/utils/logger');
