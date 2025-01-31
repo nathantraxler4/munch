@@ -42,7 +42,7 @@ type Query {
 
 type Mutation {
     addRecipes(recipes: [RecipeInput!]!): [Recipe!]!
-    generateMenuFromPrompt(prompt: String!): Menu!
+    promptAgent(prompt: String!): String!
 }
 
 type Subscription {

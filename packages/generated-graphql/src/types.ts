@@ -34,7 +34,7 @@ export type MenuStream = PartialMenu | StreamError;
 export type Mutation = {
   __typename?: 'Mutation';
   addRecipes: Array<Recipe>;
-  generateMenuFromPrompt: Menu;
+  promptAgent: Scalars['String']['output'];
 };
 
 
@@ -43,7 +43,7 @@ export type MutationAddRecipesArgs = {
 };
 
 
-export type MutationGenerateMenuFromPromptArgs = {
+export type MutationPromptAgentArgs = {
   prompt: Scalars['String']['input'];
 };
 
@@ -219,7 +219,7 @@ export type MenuStreamResolvers<ContextType = any, ParentType extends ResolversP
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addRecipes?: Resolver<Array<ResolversTypes['Recipe']>, ParentType, ContextType, RequireFields<MutationAddRecipesArgs, 'recipes'>>;
-  generateMenuFromPrompt?: Resolver<ResolversTypes['Menu'], ParentType, ContextType, RequireFields<MutationGenerateMenuFromPromptArgs, 'prompt'>>;
+  promptAgent?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationPromptAgentArgs, 'prompt'>>;
 };
 
 export type PartialMenuResolvers<ContextType = any, ParentType extends ResolversParentTypes['PartialMenu'] = ResolversParentTypes['PartialMenu']> = {

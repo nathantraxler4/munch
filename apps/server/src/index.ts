@@ -1,3 +1,5 @@
+import './setup/config';
+
 import { ApolloServer, ApolloServerPlugin } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
@@ -11,7 +13,6 @@ import { createServer } from 'http';
 import mongoose from 'mongoose';
 import { WebSocketServer } from 'ws';
 import resolvers from './graphql/resolvers';
-import './setup/config';
 import { formatError } from './utils/errors';
 import logger from './utils/logger';
 

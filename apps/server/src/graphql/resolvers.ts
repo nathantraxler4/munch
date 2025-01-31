@@ -4,13 +4,16 @@ import * as menuService from '../services/menuService';
 import * as recipeService from '../services/recipeService';
 import { formatError } from '../utils/errors';
 
+import * as orchestrationService from '../services/orchestrationService';
+
 const resolvers: Resolvers = {
     Query: {
         recipes: async () => await recipeService.getRecipes(),
         menus: async () => await menuService.getMenus()
     },
     Mutation: {
-        addRecipes: async (_parent, args) => await recipeService.addRecipes(args.recipes)
+        addRecipes: async (_parent, args) => await recipeService.addRecipes(args.recipes),
+        promptAgent: async (_parent, args) => await orchestrationService.respond(args.prompt)
     },
     MenuStream: {
         __resolveType(obj: MenuStream) {
