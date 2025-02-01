@@ -65,6 +65,7 @@ export async function* generateMenuFromPromptStream(
     }
 }
 
+// TODO: Remove this function as it has been moved to the recipe service and modified.
 async function fetchMostSimilarRecipesFromPinecone(
     index: Index,
     recipe: string | Recipe

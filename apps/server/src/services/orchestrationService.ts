@@ -1,30 +1,28 @@
 import { zodResponseFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
+import type { Message } from '../types';
+import * as humanService from './humanService';
 import * as llmService from './llmService';
-
-type Message = { author: string; content: string };
+import * as recipeService from './recipeService';
 
 const memory = new Map<number, Message[]>();
-memory.set(1, []);
 
 const ActionEnum = z.enum(['SUGGEST_RECIPES', 'BUILD_SHOPPING_LIST', 'GENERATE_MENU', 'MORE_INFO']);
-
 const RouteResponseFormat = z.object({ action: ActionEnum });
 
 type Action = z.infer<typeof ActionEnum>;
-
 type RouteResponse = z.infer<typeof RouteResponseFormat>;
 
 export async function respond(prompt: string) {
     const messages = memory.get(1) ?? [];
     const humanMessage: Message = { author: 'user', content: prompt };
     memory.set(1, [...messages, humanMessage]);
-    let action = await routeRequest(memory.get(1) ?? []);
-    action = await executeRoute(action);
-    const aiMessage = { author: 'sous chef', content: action };
+    const action = await routeRequest(memory.get(1) ?? []);
+    const response = await executeAction(action);
+    const aiMessage = { author: 'sous chef', content: response };
     memory.set(1, [...messages, aiMessage]);
 
-    return action;
+    return response;
 }
 
 async function routeRequest(messages: Message[]): Promise<Action> {
@@ -48,10 +46,10 @@ async function routeRequest(messages: Message[]): Promise<Action> {
     return routeResponse.action;
 }
 
-async function executeRoute(action: Action): Promise<Action> {
+async function executeAction(action: Action): Promise<string> {
     switch (action) {
         case ActionEnum.enum.SUGGEST_RECIPES: {
-            return action;
+            return JSON.stringify(await recipeService.suggestRecipes(memory.get(1) ?? []));
         }
         case ActionEnum.enum.BUILD_SHOPPING_LIST: {
             return action;
@@ -60,7 +58,8 @@ async function executeRoute(action: Action): Promise<Action> {
             return action;
         }
         case ActionEnum.enum.MORE_INFO: {
-            return action;
+            const query = await humanService.generateQuery(memory.get(1) ?? []);
+            return query;
         }
     }
 }
