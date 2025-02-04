@@ -4,7 +4,7 @@ import { Errors, logAndThrowError } from '../utils/errors';
 
 export async function invokeCompletionAPI(
     config: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming
-) {
+): Promise<string> {
     let content: string;
     try {
         const completion = await openai.chat.completions.create(config);

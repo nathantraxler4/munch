@@ -1,13 +1,20 @@
 import { zodResponseFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 import type { Message } from '../types';
+import logger from '../utils/logger';
 import * as humanService from './humanService';
 import * as llmService from './llmService';
+import * as menuService from './menuService';
 import * as recipeService from './recipeService';
 
 const memory = new Map<number, Message[]>();
 
-const ActionEnum = z.enum(['SUGGEST_RECIPES', 'BUILD_SHOPPING_LIST', 'GENERATE_MENU', 'MORE_INFO']);
+const ActionEnum = z.enum([
+    'SUGGEST_RECIPES',
+    /*'BUILD_SHOPPING_LIST',*/
+    'GENERATE_MENU',
+    'MORE_INFO'
+]);
 const RouteResponseFormat = z.object({ action: ActionEnum });
 
 type Action = z.infer<typeof ActionEnum>;
@@ -47,18 +54,20 @@ async function routeRequest(messages: Message[]): Promise<Action> {
 }
 
 async function executeAction(action: Action): Promise<string> {
+    logger.info(`Action chosen: ${action}`);
+    const messagesHistory = memory.get(1) ?? [];
     switch (action) {
         case ActionEnum.enum.SUGGEST_RECIPES: {
-            return JSON.stringify(await recipeService.suggestRecipes(memory.get(1) ?? []));
+            return JSON.stringify(await recipeService.suggestRecipes(messagesHistory));
         }
-        case ActionEnum.enum.BUILD_SHOPPING_LIST: {
-            return action;
-        }
+        // case ActionEnum.enum.BUILD_SHOPPING_LIST: {
+        //     return action;
+        // }
         case ActionEnum.enum.GENERATE_MENU: {
-            return action;
+            return JSON.stringify(await menuService.generateMenu(messagesHistory));
         }
         case ActionEnum.enum.MORE_INFO: {
-            const query = await humanService.generateQuery(memory.get(1) ?? []);
+            const query = await humanService.generateQuery(messagesHistory);
             return query;
         }
     }
