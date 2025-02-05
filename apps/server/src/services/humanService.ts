@@ -10,7 +10,7 @@ export function generateQuery(messages: Message[]) {
                 content: `
                     You are an information gatherer. Based on the conversation history you will construct a query
                     to present to the user that will request any necessary information to help the RECIPE_SUGGESTOR,
-                    MENU_GENERATOR, or SHOPPING_LIST_BUILDER complete is action.
+                    MENU_GENERATOR, or SHOPPING_LIST_BUILDER complete its action.
                 `
             },
             ...llmService.separateAssistantAndUserMessages(messages)

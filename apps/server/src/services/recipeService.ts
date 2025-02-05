@@ -22,6 +22,7 @@ const RecipeFormat = z.object({
     directions: z.string()
 });
 const RecipeResponseFormat = z.object({
+    response: z.string(),
     recipes: z.array(RecipeFormat)
 });
 
@@ -50,7 +51,9 @@ export async function addRecipes(recipes: RecipeInput[]): Promise<Recipe[]> {
     return insertedRecipes;
 }
 
-export async function suggestRecipes(messages: Message[]): Promise<PineconeMetaData[]> {
+export async function suggestRecipes(
+    messages: Message[]
+): Promise<{ response: string; recipes: PineconeMetaData[] }> {
     const recipesResponse = await llmService.invokeStructuredCompletionAPI<RecipeResponse>({
         model: process.env.GENERATE_RECIPE_MODEL ?? 'gpt-4o',
         messages: [
@@ -59,7 +62,7 @@ export async function suggestRecipes(messages: Message[]): Promise<PineconeMetaD
                 content: `
                         You are a recipe suggestor. Based on the conversation history you will generate 3-7 recipes
                         that are most likely to please the user. Include name, ingredients, and instructions. 
-                        Please be as concise as possible.
+                        Please be as concise as possible. Include a message for the user in the response.
                     `
             },
             ...llmService.separateAssistantAndUserMessages(messages)
@@ -75,7 +78,7 @@ export async function suggestRecipes(messages: Message[]): Promise<PineconeMetaD
         ];
     }
 
-    return pineconeRecipes;
+    return { response: recipesResponse.response, recipes: pineconeRecipes };
 }
 
 async function fetchMostSimilarRecipesFromPinecone(recipe: Recipe): Promise<PineconeMetaData[]> {

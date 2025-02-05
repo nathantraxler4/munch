@@ -1,6 +1,6 @@
 import type { Message } from '../types';
 
-import { Course, Menu } from 'generated-graphql';
+import { Menu } from 'generated-graphql';
 import { zodResponseFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 import MenuModel from '../models/menu';
@@ -10,6 +10,7 @@ import logger from '../utils/logger';
 import * as llmService from './llmService';
 
 const GeneratedMenuCourses = z.object({
+    response: z.string(),
     courses: z.array(z.object({ name: z.string(), description: z.string(), url: z.string() }))
 });
 type GeneratedMenuCoursesType = z.infer<typeof GeneratedMenuCourses>;
@@ -28,19 +29,19 @@ export async function getMenus() {
 }
 
 /**
- * Service method used to generate a Menu based on an array of Recipes.
+ * Service method used to generate a menu.
  */
-export async function generateMenu(messages: Message[]): Promise<Menu> {
+export async function generateMenu(messages: Message[]): Promise<{ response: string; menu: Menu }> {
     logger.info('Generating menu...');
     const imageGenPrompt = await _generateImageGenPrompt(messages);
-    const [courses, imageResponse] = await Promise.all([
+    const [coursesResponse, imageResponse] = await Promise.all([
         _generateCourses(messages),
         _generateBackgroundImage(imageGenPrompt)
     ]);
     const imageUrl = imageResponse.data[0].url || ''; // TO DO: Add more robust error handling
-    const menu = { courses, backgroundImage: imageUrl };
+    const menu = { courses: coursesResponse.courses, backgroundImage: imageUrl };
     await insertMenus([menu]);
-    return menu;
+    return { response: coursesResponse.response, menu };
 }
 
 export async function insertMenus(menus: Menu[]) {
@@ -76,7 +77,7 @@ async function _generateImageGenPrompt(messages: Message[]) {
     return imageGenPrompt;
 }
 
-async function _generateCourses(messages: Message[]): Promise<Course[]> {
+async function _generateCourses(messages: Message[]): Promise<GeneratedMenuCoursesType> {
     logger.info('Requesting LLM to generate descriptions...');
     const generatedCourses =
         await llmService.invokeStructuredCompletionAPI<GeneratedMenuCoursesType>({
@@ -91,7 +92,7 @@ async function _generateCourses(messages: Message[]): Promise<Course[]> {
                     of each recipe formatted as a comma separated string. Please revise the name of each ingredient 
                     so it sounds as appetizing as possible. For example, if the recipe calls for "frozen berries" 
                     revise the name to "berries". Please order the ingredients by their importance to the dish 
-                    starting with most important.  
+                    starting with most important. Include a message for the user in the response.
                 `
                 },
                 ...llmService.separateAssistantAndUserMessages(messages)
@@ -99,7 +100,7 @@ async function _generateCourses(messages: Message[]): Promise<Course[]> {
             response_format: zodResponseFormat(GeneratedMenuCourses, 'generatedMenuCourses')
         });
 
-    return generatedCourses.courses;
+    return generatedCourses;
 }
 
 async function _generateBackgroundImage(prompt: string) {
