@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import openai from '../setup/openai';
+import { Message } from '../types';
 import { Errors, logAndThrowError } from '../utils/errors';
 
 export async function invokeCompletionAPI(
@@ -71,4 +72,25 @@ export async function invokeStructuredCompletionAPI<T>(
         });
     }
     return structuredResponse;
+}
+
+export function separateAssistantAndUserMessages(
+    messages: Message[]
+): OpenAI.Chat.ChatCompletionMessageParam[] {
+    const messagesForLLM: OpenAI.Chat.ChatCompletionMessageParam[] = [];
+    for (const message of messages) {
+        if (message.author === 'sous_chef') {
+            messagesForLLM.push({
+                role: 'assistant',
+                content: message.content
+            });
+        }
+        if (message.author === 'user') {
+            messagesForLLM.push({
+                role: 'user',
+                content: message.content
+            });
+        }
+    }
+    return messagesForLLM;
 }

@@ -62,10 +62,7 @@ export async function suggestRecipes(messages: Message[]): Promise<PineconeMetaD
                         Please be as concise as possible.
                     `
             },
-            {
-                role: 'user',
-                content: JSON.stringify(messages)
-            }
+            ...llmService.separateAssistantAndUserMessages(messages)
         ],
         response_format: zodResponseFormat(RecipeResponseFormat, 'recipes')
     });

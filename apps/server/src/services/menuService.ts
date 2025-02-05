@@ -70,10 +70,7 @@ async function _generateImageGenPrompt(messages: Message[]) {
                     user is looking for.
                 `
             },
-            {
-                role: 'user',
-                content: JSON.stringify(messages) // TODO: separate user messages from ai messages
-            }
+            ...llmService.separateAssistantAndUserMessages(messages)
         ]
     });
     return imageGenPrompt;
@@ -97,10 +94,7 @@ async function _generateCourses(messages: Message[]): Promise<Course[]> {
                     starting with most important.  
                 `
                 },
-                {
-                    role: 'user',
-                    content: JSON.stringify(messages)
-                }
+                ...llmService.separateAssistantAndUserMessages(messages)
             ],
             response_format: zodResponseFormat(GeneratedMenuCourses, 'generatedMenuCourses')
         });

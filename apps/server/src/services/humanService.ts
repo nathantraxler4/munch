@@ -13,10 +13,7 @@ export function generateQuery(messages: Message[]) {
                     MENU_GENERATOR, or SHOPPING_LIST_BUILDER complete is action.
                 `
             },
-            {
-                role: 'user',
-                content: JSON.stringify(messages)
-            }
+            ...llmService.separateAssistantAndUserMessages(messages)
         ]
     });
     return query;
