@@ -29,12 +29,10 @@ export type Menu = {
   courses: Array<Course>;
 };
 
-export type MenuStream = PartialMenu | StreamError;
-
 export type Mutation = {
   __typename?: 'Mutation';
   addRecipes: Array<Recipe>;
-  promptAgent: Scalars['String']['output'];
+  promptAgent: SousChefResponse;
 };
 
 
@@ -45,12 +43,6 @@ export type MutationAddRecipesArgs = {
 
 export type MutationPromptAgentArgs = {
   prompt: Scalars['String']['input'];
-};
-
-export type PartialMenu = {
-  __typename?: 'PartialMenu';
-  backgroundImage?: Maybe<Scalars['String']['output']>;
-  courses?: Maybe<Array<Course>>;
 };
 
 export type Query = {
@@ -67,8 +59,8 @@ export type QueryGenerateMenuArgs = {
 
 export type Recipe = {
   __typename?: 'Recipe';
-  directions: Scalars['String']['output'];
-  ingredients: Scalars['String']['output'];
+  ingredients: Array<Scalars['String']['output']>;
+  instructions: Array<Scalars['String']['output']>;
   name: Scalars['String']['output'];
 };
 
@@ -79,20 +71,11 @@ export type RecipeInput = {
   url: Scalars['String']['input'];
 };
 
-export type StreamError = {
-  __typename?: 'StreamError';
-  code: Scalars['String']['output'];
+export type SousChefResponse = {
+  __typename?: 'SousChefResponse';
+  menu?: Maybe<Menu>;
   message: Scalars['String']['output'];
-};
-
-export type Subscription = {
-  __typename?: 'Subscription';
-  generateMenuFromPrompt?: Maybe<MenuStream>;
-};
-
-
-export type SubscriptionGenerateMenuFromPromptArgs = {
-  prompt: Scalars['String']['input'];
+  recipes?: Maybe<Array<Recipe>>;
 };
 
 
@@ -162,10 +145,6 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
   info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>;
 
-/** Mapping of union types */
-export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = {
-  MenuStream: ( PartialMenu ) | ( StreamError );
-};
 
 
 /** Mapping between all available schema types and the resolvers types */
@@ -173,15 +152,12 @@ export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Course: ResolverTypeWrapper<Course>;
   Menu: ResolverTypeWrapper<Menu>;
-  MenuStream: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['MenuStream']>;
   Mutation: ResolverTypeWrapper<{}>;
-  PartialMenu: ResolverTypeWrapper<PartialMenu>;
   Query: ResolverTypeWrapper<{}>;
   Recipe: ResolverTypeWrapper<Recipe>;
   RecipeInput: RecipeInput;
-  StreamError: ResolverTypeWrapper<StreamError>;
+  SousChefResponse: ResolverTypeWrapper<SousChefResponse>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
-  Subscription: ResolverTypeWrapper<{}>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -189,15 +165,12 @@ export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
   Course: Course;
   Menu: Menu;
-  MenuStream: ResolversUnionTypes<ResolversParentTypes>['MenuStream'];
   Mutation: {};
-  PartialMenu: PartialMenu;
   Query: {};
   Recipe: Recipe;
   RecipeInput: RecipeInput;
-  StreamError: StreamError;
+  SousChefResponse: SousChefResponse;
   String: Scalars['String']['output'];
-  Subscription: {};
 };
 
 export type CourseResolvers<ContextType = any, ParentType extends ResolversParentTypes['Course'] = ResolversParentTypes['Course']> = {
@@ -213,19 +186,9 @@ export type MenuResolvers<ContextType = any, ParentType extends ResolversParentT
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MenuStreamResolvers<ContextType = any, ParentType extends ResolversParentTypes['MenuStream'] = ResolversParentTypes['MenuStream']> = {
-  __resolveType: TypeResolveFn<'PartialMenu' | 'StreamError', ParentType, ContextType>;
-};
-
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addRecipes?: Resolver<Array<ResolversTypes['Recipe']>, ParentType, ContextType, RequireFields<MutationAddRecipesArgs, 'recipes'>>;
-  promptAgent?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationPromptAgentArgs, 'prompt'>>;
-};
-
-export type PartialMenuResolvers<ContextType = any, ParentType extends ResolversParentTypes['PartialMenu'] = ResolversParentTypes['PartialMenu']> = {
-  backgroundImage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  courses?: Resolver<Maybe<Array<ResolversTypes['Course']>>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+  promptAgent?: Resolver<ResolversTypes['SousChefResponse'], ParentType, ContextType, RequireFields<MutationPromptAgentArgs, 'prompt'>>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
@@ -235,31 +198,25 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 };
 
 export type RecipeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Recipe'] = ResolversParentTypes['Recipe']> = {
-  directions?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  ingredients?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  ingredients?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  instructions?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type StreamErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['StreamError'] = ResolversParentTypes['StreamError']> = {
-  code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+export type SousChefResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['SousChefResponse'] = ResolversParentTypes['SousChefResponse']> = {
+  menu?: Resolver<Maybe<ResolversTypes['Menu']>, ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  recipes?: Resolver<Maybe<Array<ResolversTypes['Recipe']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
-  generateMenuFromPrompt?: SubscriptionResolver<Maybe<ResolversTypes['MenuStream']>, "generateMenuFromPrompt", ParentType, ContextType, RequireFields<SubscriptionGenerateMenuFromPromptArgs, 'prompt'>>;
 };
 
 export type Resolvers<ContextType = any> = {
   Course?: CourseResolvers<ContextType>;
   Menu?: MenuResolvers<ContextType>;
-  MenuStream?: MenuStreamResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
-  PartialMenu?: PartialMenuResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Recipe?: RecipeResolvers<ContextType>;
-  StreamError?: StreamErrorResolvers<ContextType>;
-  Subscription?: SubscriptionResolvers<ContextType>;
+  SousChefResponse?: SousChefResponseResolvers<ContextType>;
 };
 

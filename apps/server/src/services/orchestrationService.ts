@@ -22,12 +22,12 @@ type RouteResponse = z.infer<typeof RouteResponseFormat>;
 
 export async function respond(prompt: string) {
     let messages = memory.get(1) ?? [];
-    const humanMessage: Message = { author: 'user', content: prompt };
+    const humanMessage: Message = { author: 'user', message: prompt };
     memory.set(1, [...messages, humanMessage]);
     const action = await routeRequest(memory.get(1) ?? []);
     const response = await executeAction(action);
     messages = memory.get(1) ?? [];
-    const aiMessage = { author: 'sous_chef', content: response };
+    const aiMessage: Message = { author: 'sous_chef', ...response };
     memory.set(1, [...messages, aiMessage]);
 
     return response;
@@ -52,18 +52,18 @@ async function routeRequest(messages: Message[]): Promise<Action> {
     return routeResponse.action;
 }
 
-async function executeAction(action: Action): Promise<string> {
+async function executeAction(action: Action): Promise<Omit<Message, 'author'>> {
     logger.info(`Action chosen: ${action}`);
     const messagesHistory = memory.get(1) ?? [];
     switch (action) {
         case ActionEnum.enum.SUGGEST_RECIPES: {
-            return JSON.stringify(await recipeService.suggestRecipes(messagesHistory));
+            return await recipeService.suggestRecipes(messagesHistory);
         }
         // case ActionEnum.enum.BUILD_SHOPPING_LIST: {
         //     return action;
         // }
         case ActionEnum.enum.GENERATE_MENU: {
-            return JSON.stringify(await menuService.generateMenu(messagesHistory));
+            return await menuService.generateMenu(messagesHistory);
         }
         case ActionEnum.enum.MORE_INFO: {
             const query = await humanService.generateQuery(messagesHistory);

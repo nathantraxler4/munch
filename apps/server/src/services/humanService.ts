@@ -1,8 +1,8 @@
 import type { Message } from '../types';
 import * as llmService from './llmService';
 
-export function generateQuery(messages: Message[]) {
-    const query = llmService.invokeCompletionAPI({
+export async function generateQuery(messages: Message[]) {
+    const query = await llmService.invokeCompletionAPI({
         model: process.env.GENERATE_RECIPE_MODEL ?? 'gpt-4o',
         messages: [
             {
@@ -16,5 +16,5 @@ export function generateQuery(messages: Message[]) {
             ...llmService.separateAssistantAndUserMessages(messages)
         ]
     });
-    return query;
+    return { message: query };
 }

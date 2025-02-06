@@ -1,7 +1,7 @@
 type Recipe {
     name: String!
-    ingredients: String!
-    directions: String!
+    ingredients: [String!]!
+    instructions: [String!]!
 }
 
 type Menu {
@@ -15,17 +15,11 @@ type Course {
     url: String!
 }
 
-type StreamError {
+type SousChefResponse {
     message: String!
-    code: String!
+    menu: Menu
+    recipes: [Recipe!]
 }
-
-type PartialMenu {
-    courses: [Course!]
-    backgroundImage: String
-}
-
-union MenuStream = PartialMenu | StreamError
 
 input RecipeInput {
     name: String!
@@ -42,9 +36,5 @@ type Query {
 
 type Mutation {
     addRecipes(recipes: [RecipeInput!]!): [Recipe!]!
-    promptAgent(prompt: String!): String!
-}
-
-type Subscription {
-    generateMenuFromPrompt(prompt: String!): MenuStream
+    promptAgent(prompt: String!): SousChefResponse!
 }

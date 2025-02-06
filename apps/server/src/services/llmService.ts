@@ -82,13 +82,13 @@ export function separateAssistantAndUserMessages(
         if (message.author === 'sous_chef') {
             messagesForLLM.push({
                 role: 'assistant',
-                content: message.content
+                content: message.message
             });
         }
         if (message.author === 'user') {
             messagesForLLM.push({
                 role: 'user',
-                content: message.content
+                content: message.message
             });
         }
     }

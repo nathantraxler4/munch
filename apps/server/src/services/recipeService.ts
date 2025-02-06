@@ -1,12 +1,11 @@
 import { EmbeddingsList, Index, QueryResponse } from '@pinecone-database/pinecone';
-import { RecipeInput } from 'generated-graphql';
 import { GraphQLError } from 'graphql';
 import { zodResponseFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 import RecipeModel from '../models/recipe';
 import * as llmService from '../services/llmService';
 import pc from '../setup/pinecone';
-import { Message, PineconeMetaData } from '../types';
+import { Message, PineconeMetaData, SuggestRecipesResponse } from '../types';
 import { Errors, logAndThrowError } from '../utils/errors';
 import logger from '../utils/logger';
 
@@ -29,31 +28,18 @@ const RecipeResponseFormat = z.object({
 type Recipe = z.infer<typeof RecipeFormat>;
 type RecipeResponse = z.infer<typeof RecipeResponseFormat>;
 
-export async function getRecipes(): Promise<Recipe[]> {
-    let recipes;
-    try {
-        recipes = await RecipeModel.find({});
-    } catch (error) {
-        logger.error(error);
-        throw error;
-    }
-    return recipes;
-}
+// export async function getRecipes(): Promise<Recipe[]> {
+//     let recipes;
+//     try {
+//         recipes = await RecipeModel.find({});
+//     } catch (error) {
+//         logger.error(error);
+//         throw error;
+//     }
+//     return recipes;
+// }
 
-export async function addRecipes(recipes: RecipeInput[]): Promise<Recipe[]> {
-    let insertedRecipes;
-    try {
-        insertedRecipes = await RecipeModel.insertMany(recipes);
-    } catch (error) {
-        logger.error(error);
-        throw error;
-    }
-    return insertedRecipes;
-}
-
-export async function suggestRecipes(
-    messages: Message[]
-): Promise<{ response: string; recipes: PineconeMetaData[] }> {
+export async function suggestRecipes(messages: Message[]): Promise<SuggestRecipesResponse> {
     const recipesResponse = await llmService.invokeStructuredCompletionAPI<RecipeResponse>({
         model: process.env.GENERATE_RECIPE_MODEL ?? 'gpt-4o',
         messages: [
@@ -70,25 +56,25 @@ export async function suggestRecipes(
         response_format: zodResponseFormat(RecipeResponseFormat, 'recipes')
     });
 
-    let pineconeRecipes: PineconeMetaData[] = [];
+    let recipeUrls: string[] = [];
     for (const pineconeRecipe of recipesResponse.recipes) {
-        pineconeRecipes = [
-            ...pineconeRecipes,
+        recipeUrls = [
+            ...recipeUrls,
             ...(await fetchMostSimilarRecipesFromPinecone(pineconeRecipe))
         ];
     }
 
-    return { response: recipesResponse.response, recipes: pineconeRecipes };
+    const recipes = await RecipeModel.find({ url: { $in: recipeUrls } }); // TODO fetch recipes correctly
+
+    return { message: recipesResponse.response, recipes: recipes };
 }
 
-async function fetchMostSimilarRecipesFromPinecone(recipe: Recipe): Promise<PineconeMetaData[]> {
+async function fetchMostSimilarRecipesFromPinecone(recipe: Recipe): Promise<string[]> {
     const vector = await getEmbedding(JSON.stringify(recipe));
     const queryResponse = await queryPinecone(index, vector);
     validateQueryResponse(queryResponse);
-    const recipes: PineconeMetaData[] = queryResponse.matches.map(
-        (m) => m.metadata
-    ) as PineconeMetaData[];
-    return recipes;
+    const recipesUrls = queryResponse.matches.map((m) => m.metadata?.url) as string[];
+    return recipesUrls;
 }
 
 function validateQueryResponse(queryResponse: QueryResponse) {

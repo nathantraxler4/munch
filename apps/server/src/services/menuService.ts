@@ -1,4 +1,4 @@
-import type { Message } from '../types';
+import type { GenerateMenuResponse, Message } from '../types';
 
 import { Menu } from 'generated-graphql';
 import { zodResponseFormat } from 'openai/helpers/zod';
@@ -31,7 +31,7 @@ export async function getMenus() {
 /**
  * Service method used to generate a menu.
  */
-export async function generateMenu(messages: Message[]): Promise<{ response: string; menu: Menu }> {
+export async function generateMenu(messages: Message[]): Promise<GenerateMenuResponse> {
     logger.info('Generating menu...');
     const imageGenPrompt = await _generateImageGenPrompt(messages);
     const [coursesResponse, imageResponse] = await Promise.all([
@@ -41,7 +41,7 @@ export async function generateMenu(messages: Message[]): Promise<{ response: str
     const imageUrl = imageResponse.data[0].url || ''; // TO DO: Add more robust error handling
     const menu = { courses: coursesResponse.courses, backgroundImage: imageUrl };
     await insertMenus([menu]);
-    return { response: coursesResponse.response, menu };
+    return { message: coursesResponse.response, menu };
 }
 
 export async function insertMenus(menus: Menu[]) {
