@@ -1,33 +1,21 @@
 import { gql } from '@apollo/client';
 
-export const GENERATE_MENU_FROM_PROMPT = gql`
-    mutation GenerateMenuFromPrompt($prompt: String!) {
-        generateMenuFromPrompt(prompt: $prompt) {
-            backgroundImage
-            courses {
+export const PROMPT_AGENT = gql`
+    mutation PromptAgent($prompt: String!) {
+        promptAgent(prompt: $prompt) {
+            message
+            recipes {
                 name
-                description
-                url
+                ingredients
+                instructions
             }
-        }
-    }
-`;
-
-export const GENERATE_MENU_FROM_PROMPT_STREAM = gql`
-    subscription Subscription($prompt: String!) {
-        generateMenuFromPrompt(prompt: $prompt) {
-            __typename
-            ... on PartialMenu {
-                backgroundImage
+            menu {
                 courses {
-                    name
                     description
+                    name
                     url
                 }
-            }
-            ... on StreamError {
-                message
-                code
+                backgroundImage
             }
         }
     }

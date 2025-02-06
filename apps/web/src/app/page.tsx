@@ -1,68 +1,29 @@
 'use client';
 
-import { useSubscription } from '@apollo/client';
-import { StreamError } from 'generated-graphql';
+import ChatWindow from '@/components/ChatWindow';
+import { useMutation } from '@apollo/client';
+import { Menu, Recipe } from 'generated-graphql';
 import { useEffect, useState } from 'react';
-import { MenuDisplay } from '../components/MenuDisplay';
 import { PromptForm } from '../components/PromptForm';
 import { Spinner } from '../components/Spinner';
-import { GENERATE_MENU_FROM_PROMPT_STREAM } from '../graphql/mutations';
+import { PROMPT_AGENT } from '../graphql/mutations';
 
-const emptyMenu = {
-    courses: [],
-    backgroundImage: ''
-};
+type Message = { message: string; menu: Menu; recipes: Recipe[] }; // TODO: consolidate this type with type defined in server.d
 
 export default function Home() {
     const [userInput, setUserInput] = useState('');
-    const [shouldSubscribe, setShouldSubscribe] = useState(false);
-    const [menu, setMenu] = useState(emptyMenu);
-    const [subscriptionError, setSubscriptionError] = useState<StreamError | null>(null);
-    let errorMessage = subscriptionError?.message;
+    const [conversationMessages, setConversationMessages] = useState<Message[]>([]);
+    const [errorMessage, setErrorMessage] = useState();
 
     // eslint-disable-next-line prefer-const
-    let { data, error, loading } = useSubscription(GENERATE_MENU_FROM_PROMPT_STREAM, {
-        variables: { prompt: userInput },
-        skip: !shouldSubscribe
+    let [promptAgent, { data, /*error,*/ loading }] = useMutation(PROMPT_AGENT, {
+        variables: { prompt: userInput }
     });
 
-    if (error) {
-        errorMessage = error.message;
-    }
-
-    // Reset any previous errors when a new subscription is started.
     useEffect(() => {
-        if (shouldSubscribe) {
-            setSubscriptionError(null);
-            setMenu(emptyMenu);
-        }
-    }, [shouldSubscribe]);
-
-    useEffect(() => {
-        if (!data?.generateMenuFromPrompt) return;
-        const menuStream = data.generateMenuFromPrompt;
-
-        if (menuStream.__typename === 'StreamError') {
-            setSubscriptionError(menuStream);
-            setMenu({ ...emptyMenu });
-            setShouldSubscribe(false);
-            return;
-        }
-
-        if (menuStream.courses && menuStream.courses.length > 0) {
-            setMenu((prev) => ({
-                ...prev,
-                courses: menuStream.courses
-            }));
-        }
-
-        if (menuStream.backgroundImage) {
-            setMenu((prev) => ({
-                ...prev,
-                backgroundImage: menuStream.backgroundImage
-            }));
-
-            setShouldSubscribe(false);
+        console.log(data);
+        if (data) {
+            setConversationMessages((prev) => [...prev, data.promptAgent]);
         }
     }, [data]);
 
@@ -72,10 +33,7 @@ export default function Home() {
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (userInput) {
-            setMenu({ ...emptyMenu });
-            setShouldSubscribe(true);
-        }
+        promptAgent({ variables: { prompt: userInput } });
     };
 
     function renderContent() {
@@ -85,10 +43,7 @@ export default function Home() {
         if (errorMessage) {
             return <div className="text-red-500 text-lg">{errorMessage}</div>;
         }
-        if (menu?.courses.length > 0 || menu.backgroundImage) {
-            return <MenuDisplay menu={menu} />;
-        }
-        return null;
+        return <ChatWindow messages={conversationMessages} />;
     }
 
     return (
