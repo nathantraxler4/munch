@@ -1,6 +1,6 @@
 import { zodResponseFormat } from 'openai/helpers/zod';
+import type { Message } from 'types';
 import { z } from 'zod';
-import type { Message } from '../types';
 import logger from '../utils/logger';
 import * as humanService from './humanService';
 import * as llmService from './llmService';

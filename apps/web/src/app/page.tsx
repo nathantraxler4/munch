@@ -2,13 +2,11 @@
 
 import ChatWindow from '@/components/ChatWindow';
 import { useMutation } from '@apollo/client';
-import { Menu, Recipe } from 'generated-graphql';
 import { useEffect, useState } from 'react';
+import type { Message } from 'types';
 import { PromptForm } from '../components/PromptForm';
 import { Spinner } from '../components/Spinner';
 import { PROMPT_AGENT } from '../graphql/mutations';
-
-type Message = { message: string; menu: Menu; recipes: Recipe[] }; // TODO: consolidate this type with type defined in server.d
 
 export default function Home() {
     const [userInput, setUserInput] = useState('');

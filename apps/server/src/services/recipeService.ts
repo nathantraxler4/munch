@@ -1,11 +1,12 @@
 import { EmbeddingsList, Index, QueryResponse } from '@pinecone-database/pinecone';
 import { GraphQLError } from 'graphql';
 import { zodResponseFormat } from 'openai/helpers/zod';
+import type { Message } from 'types';
 import { z } from 'zod';
 import RecipeModel from '../models/recipe';
 import * as llmService from '../services/llmService';
 import pc from '../setup/pinecone';
-import { Message, PineconeMetaData, SuggestRecipesResponse } from '../types';
+import type { PineconeMetaData, SuggestRecipesResponse } from '../types';
 import { Errors, logAndThrowError } from '../utils/errors';
 import logger from '../utils/logger';
 

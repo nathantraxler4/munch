@@ -1,6 +1,4 @@
-import { Menu, Recipe } from 'generated-graphql';
-
-type Message = { message: string; menu: Menu; recipes: Recipe[] }; // TODO: consolidate this type with type defined in server.d
+import type { Message } from 'types';
 
 type ChatWindowProps = { messages: Message[] };
 

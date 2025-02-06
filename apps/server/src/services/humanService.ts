@@ -1,4 +1,4 @@
-import type { Message } from '../types';
+import type { Message } from 'types';
 import * as llmService from './llmService';
 
 export async function generateQuery(messages: Message[]) {

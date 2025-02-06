@@ -1,4 +1,5 @@
-import type { GenerateMenuResponse, Message } from '../types';
+import type { Message } from 'types';
+import type { GenerateMenuResponse } from '../types';
 
 import { Menu } from 'generated-graphql';
 import { zodResponseFormat } from 'openai/helpers/zod';

@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
+import type { Message } from 'types';
 import openai from '../setup/openai';
-import { Message } from '../types';
 import { Errors, logAndThrowError } from '../utils/errors';
 
 export async function invokeCompletionAPI(
