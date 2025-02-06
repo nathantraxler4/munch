@@ -11,10 +11,10 @@ import { PROMPT_AGENT } from '../graphql/mutations';
 export default function Home() {
     const [userInput, setUserInput] = useState('');
     const [conversationMessages, setConversationMessages] = useState<Message[]>([]);
-    const [errorMessage, setErrorMessage] = useState();
+    const [errorMessage, setErrorMessage] = useState<string>();
 
     // eslint-disable-next-line prefer-const
-    let [promptAgent, { data, /*error,*/ loading }] = useMutation(PROMPT_AGENT, {
+    let [promptAgent, { data, error, loading }] = useMutation(PROMPT_AGENT, {
         variables: { prompt: userInput }
     });
 
@@ -24,6 +24,13 @@ export default function Home() {
             setConversationMessages((prev) => [...prev, data.promptAgent]);
         }
     }, [data]);
+
+    useEffect(() => {
+        console.log(error);
+        if (error) {
+            setErrorMessage(error.message);
+        }
+    }, [error]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setUserInput(event.target.value);
