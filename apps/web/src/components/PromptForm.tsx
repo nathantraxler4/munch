@@ -10,7 +10,7 @@ interface PromptFormProps {
 
 export function PromptForm({ className, userInput, onInputChange, onSubmit }: PromptFormProps) {
     return (
-        <div className={`${className} pb-12 px-24 sm:px-4 flex justify-center bg-slate-800 w-full`}>
+        <div className={`${className} pb-12  flex justify-center bg-slate-800 w-full`}>
             <form
                 onSubmit={onSubmit}
                 className={`flex items-center gap-3 p-4 bg-slate-700 rounded-md w-screen max-w-5xl focus-within:ring-2 focus-within:ring-green-600`}

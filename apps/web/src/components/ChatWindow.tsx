@@ -1,12 +1,13 @@
 import type { Message } from 'types';
+import ChatBubble from './ChatBubble';
 
 type ChatWindowProps = { messages: Message[] };
 
 export default function ChatWindow({ messages }: ChatWindowProps) {
     return (
-        <div>
+        <div className="max-w-5xl">
             {messages.map((message) => {
-                return <div key={message.message}>{message.message}</div>;
+                return <ChatBubble key={message.message} message={message} />;
             })}
         </div>
     );
