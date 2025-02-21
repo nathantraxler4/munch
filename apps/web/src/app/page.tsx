@@ -25,7 +25,6 @@ export default function Home() {
     }, [data]);
 
     useEffect(() => {
-        console.log(error);
         if (error) {
             setErrorMessage(error.message);
         }
@@ -41,7 +40,6 @@ export default function Home() {
             promptAgent({ variables: { prompt: userInput } });
             setUserInput("");
         }
-
     };
 
     function renderOrLoadingError() {
