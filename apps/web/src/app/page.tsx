@@ -37,6 +37,11 @@ export default function Home() {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (userInput.trim().length > 0) {
+            const userMessage: Message = {
+                author: 'user',
+                message: userInput,
+            }
+            setConversationMessages((prev) => [...prev, userMessage]);
             promptAgent({ variables: { prompt: userInput } });
             setUserInput("");
         }
