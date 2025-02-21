@@ -60,13 +60,13 @@ export default function Home() {
         <div className="flex flex-col min-h-screen bg-slate-800">
             <div className="p-4 text-white text-2xl font-bold">Munch</div>
 
-            <div className="flex-1 flex flex-col justify-center items-center gap-8 overflow-y-auto">
+            <div className="max-h-vh flex-1 flex flex-col justify-center items-center gap-8">
                 <ChatWindow messages={conversationMessages} />
                 {renderOrLoadingError()}
             </div>
 
             <PromptForm
-                className="fixed bottom-0 z-50"
+                className="py-4"
                 userInput={userInput}
                 onInputChange={handleInputChange}
                 onSubmit={handleSubmit}
