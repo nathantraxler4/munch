@@ -9,6 +9,13 @@ interface PromptFormProps {
 }
 
 export function PromptForm({ className, userInput, onInputChange, onSubmit }: PromptFormProps) {
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            onSubmit(event as unknown as React.FormEvent<HTMLFormElement>);
+        }
+    };
+    
     return (
         <div className={`${className} pb-12  flex justify-center bg-slate-800 w-full`}>
             <form
@@ -20,6 +27,7 @@ export function PromptForm({ className, userInput, onInputChange, onSubmit }: Pr
                     name="user-text"
                     value={userInput}
                     onChange={onInputChange}
+                    onKeyDown={handleKeyDown}
                     placeholder="Please provide me with any context relevant to crafting your perfect menu."
                     minRows={1}
                     maxRows={20}

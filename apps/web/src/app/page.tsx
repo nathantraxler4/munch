@@ -19,7 +19,6 @@ export default function Home() {
     });
 
     useEffect(() => {
-        console.log(data);
         if (data) {
             setConversationMessages((prev) => [...prev, data.promptAgent]);
         }
@@ -41,14 +40,13 @@ export default function Home() {
         promptAgent({ variables: { prompt: userInput } });
     };
 
-    function renderContent() {
+    function renderOrLoadingError() {
         if (loading) {
             return <Spinner />;
         }
         if (errorMessage) {
             return <div className="text-red-500 text-lg">{errorMessage}</div>;
         }
-        return <ChatWindow messages={conversationMessages} />;
     }
 
     return (
@@ -56,7 +54,8 @@ export default function Home() {
             <div className="p-4 text-white text-2xl font-bold">Munch</div>
 
             <div className="flex-1 flex flex-col justify-center items-center gap-8 overflow-y-auto">
-                {renderContent()}
+                <ChatWindow messages={conversationMessages} />
+                {renderOrLoadingError()}
             </div>
 
             <PromptForm
