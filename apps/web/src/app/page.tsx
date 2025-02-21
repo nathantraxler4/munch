@@ -5,7 +5,6 @@ import { useMutation } from '@apollo/client';
 import { useEffect, useState } from 'react';
 import type { Message } from 'types';
 import { PromptForm } from '../components/PromptForm';
-import { Spinner } from '../components/Spinner';
 import { PROMPT_AGENT } from '../graphql/mutations';
 
 export default function Home() {
@@ -47,10 +46,7 @@ export default function Home() {
         }
     };
 
-    function renderOrLoadingError() {
-        if (loading) {
-            return <Spinner />;
-        }
+    function renderError() {
         if (errorMessage) {
             return <div className="text-red-500 text-lg">{errorMessage}</div>;
         }
@@ -61,8 +57,8 @@ export default function Home() {
             <div className="p-4 text-white text-2xl font-bold">Munch</div>
 
             <div className="max-h-vh flex-1 flex flex-col justify-center items-center gap-8">
-                <ChatWindow messages={conversationMessages} />
-                {renderOrLoadingError()}
+                <ChatWindow messages={conversationMessages} loading={loading} />
+                {renderError()}
             </div>
 
             <PromptForm

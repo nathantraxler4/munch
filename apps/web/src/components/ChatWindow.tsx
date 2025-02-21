@@ -2,9 +2,14 @@ import type { Message } from 'types';
 import ChatBubble from './ChatBubble';
 import { useEffect, useRef } from 'react';
 
-type ChatWindowProps = { messages: Message[] };
+type ChatWindowProps = { messages: Message[], loading?: boolean };
 
-export default function ChatWindow({ messages }: ChatWindowProps) {
+const aiLoadingMessage: Message = {
+    author: 'ai',
+    message: '...',
+}
+
+export default function ChatWindow({ messages, loading }: ChatWindowProps) {
     const chatEndRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -16,8 +21,10 @@ export default function ChatWindow({ messages }: ChatWindowProps) {
             {messages.map((message) => {
                 return <ChatBubble key={message.message} message={message} />;
             })}
+            {loading && (
+                <ChatBubble message={aiLoadingMessage} />
+            )}
             <div ref={chatEndRef} />
-
         </div>
     );
 }
