@@ -37,7 +37,11 @@ export default function Home() {
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        promptAgent({ variables: { prompt: userInput } });
+        if (userInput.trim().length > 0) {
+            promptAgent({ variables: { prompt: userInput } });
+            setUserInput("");
+        }
+
     };
 
     function renderOrLoadingError() {
