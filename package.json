@@ -11,8 +11,5 @@
     "workspaces": [
         "apps/*",
         "packages/*"
-    ],
-    "overrides": {
-        "graphql-ws": "5.16.2"
-    }
+    ]
 }

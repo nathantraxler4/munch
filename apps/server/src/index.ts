@@ -8,10 +8,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 import { readFileSync } from 'fs';
-import { useServer } from 'graphql-ws/lib/use/ws';
 import { createServer } from 'http';
 import mongoose from 'mongoose';
-import { WebSocketServer } from 'ws';
 import resolvers from './graphql/resolvers';
 import { formatError } from './utils/errors';
 import logger from './utils/logger';
@@ -56,31 +54,6 @@ import logger from './utils/logger';
 
     await mongoose.connect('mongodb://127.0.0.1:27017/test');
 
-    const wsServer = new WebSocketServer({
-        server: httpServer,
-        path: graphqlPath
-    });
-
-    const serverCleanup = useServer(
-        {
-            schema,
-            onConnect: () => {
-                logger.info('Connected!');
-            }
-        },
-        wsServer
-    );
-
-    server.addPlugin({
-        async serverWillStart() {
-            return {
-                async drainServer() {
-                    await serverCleanup.dispose();
-                }
-            };
-        }
-    });
-
     await server.start();
 
     app.use(
@@ -93,6 +66,5 @@ import logger from './utils/logger';
     const PORT = 4000;
     httpServer.listen(PORT, () => {
         logger.info(`🚀 Server ready at http://localhost:${PORT}${graphqlPath}`);
-        logger.info(`🚀 Subscriptions ready at ws://localhost:${PORT}${graphqlPath}`);
     });
 })();
