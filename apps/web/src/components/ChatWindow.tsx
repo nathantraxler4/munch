@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 type ChatWindowProps = { messages: Message[], loading?: boolean };
 
 const aiLoadingMessage: Message = {
+    id: -1,
     author: 'ai',
     message: '...',
 }
@@ -19,7 +20,7 @@ export default function ChatWindow({ messages, loading }: ChatWindowProps) {
     return (
         <div className="max-w-5xl w-full flex flex-col gap-4 overflow-y-auto">
             {messages.map((message) => {
-                return <ChatBubble key={message.message} message={message} />;
+                return <ChatBubble key={message.id} message={message} />;
             })}
             {loading && (
                 <ChatBubble message={aiLoadingMessage} />
