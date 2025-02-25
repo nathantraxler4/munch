@@ -6,9 +6,10 @@ interface PromptFormProps {
     userInput: string;
     onInputChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+    isLoading?: boolean;
 }
 
-export function PromptForm({ className, userInput, onInputChange, onSubmit }: PromptFormProps) {
+export function PromptForm({ className, userInput, onInputChange, onSubmit, isLoading }: PromptFormProps) {
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
@@ -31,11 +32,13 @@ export function PromptForm({ className, userInput, onInputChange, onSubmit }: Pr
                     placeholder="Please provide me with any context relevant to crafting your perfect menu."
                     minRows={1}
                     maxRows={20}
-                    className="flex-1 resize-none p-1 bg-slate-700 border border-slate-700 rounded-md focus:outline-none text-white"
+                    className="flex-1 resize-none p-1 bg-slate-700 border border-slate-700 rounded-md focus:outline-none text-white disabled:opacity-50"
+                    disabled={isLoading}
                 />
                 <button
                     type="submit"
-                    className="bg-green-600 hover:bg-green-700 text-white font-medium p-3 focus:outline-none rounded-full"
+                    className="bg-green-600 hover:bg-green-700 text-white font-medium p-3 focus:outline-none rounded-full disabled:opacity-50 disabled:hover:bg-green-600"
+                    disabled={isLoading}
                 >
                     <FaArrowUp className="w-4 h-4" />
                 </button>
