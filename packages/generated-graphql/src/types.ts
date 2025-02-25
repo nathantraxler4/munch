@@ -73,6 +73,7 @@ export type RecipeInput = {
 
 export type SousChefResponse = {
   __typename?: 'SousChefResponse';
+  id: Scalars['Int']['output'];
   menu?: Maybe<Menu>;
   message: Scalars['String']['output'];
   recipes?: Maybe<Array<Recipe>>;
@@ -151,6 +152,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Course: ResolverTypeWrapper<Course>;
+  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Menu: ResolverTypeWrapper<Menu>;
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
@@ -164,6 +166,7 @@ export type ResolversTypes = {
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
   Course: Course;
+  Int: Scalars['Int']['output'];
   Menu: Menu;
   Mutation: {};
   Query: {};
@@ -205,6 +208,7 @@ export type RecipeResolvers<ContextType = any, ParentType extends ResolversParen
 };
 
 export type SousChefResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['SousChefResponse'] = ResolversParentTypes['SousChefResponse']> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   menu?: Resolver<Maybe<ResolversTypes['Menu']>, ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   recipes?: Resolver<Maybe<Array<ResolversTypes['Recipe']>>, ParentType, ContextType>;
