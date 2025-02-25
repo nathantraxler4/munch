@@ -37,6 +37,7 @@ export default function Home() {
         event.preventDefault();
         if (userInput.trim().length > 0) {
             const userMessage: Message = {
+                id: (-1 * conversationMessages.length) - 1, // This is a placeholder unique id while conversation is in progress so we don't need a unique key from the backend
                 author: Author.USER,
                 message: userInput,
             }
