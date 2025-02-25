@@ -1,9 +1,9 @@
-import { Message } from 'types';
+import { Message, Author } from 'types';
 
 type ChatBubbleParams = { message: Message };
 
 export default function ChatBubble({ message }: ChatBubbleParams) {
-    const isUser = message.author === 'user';
+    const isUser = message.author === Author.USER;
     const userBubbleStyle = 'bg-green-600 self-end'
     const aiBubbleStyle = 'bg-slate-600 self-start'
     const bubbleStyle = isUser ? userBubbleStyle : aiBubbleStyle;

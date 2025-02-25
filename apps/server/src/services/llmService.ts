@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import type { Message } from 'types';
+import { Author, type Message } from 'types';
 import openai from '../setup/openai';
 import { Errors, logAndThrowError } from '../utils/errors';
 
@@ -79,13 +79,13 @@ export function separateAssistantAndUserMessages(
 ): OpenAI.Chat.ChatCompletionMessageParam[] {
     const messagesForLLM: OpenAI.Chat.ChatCompletionMessageParam[] = [];
     for (const message of messages) {
-        if (message.author === 'sous_chef') {
+        if (message.author === Author.SOUS_CHEF) {
             messagesForLLM.push({
                 role: 'assistant',
                 content: message.message
             });
         }
-        if (message.author === 'user') {
+        if (message.author === Author.USER) {
             messagesForLLM.push({
                 role: 'user',
                 content: message.message

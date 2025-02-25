@@ -1,4 +1,4 @@
-import type { Message } from 'types';
+import { Message, Author } from 'types';
 import ChatBubble from './ChatBubble';
 import { useEffect, useRef } from 'react';
 
@@ -6,7 +6,7 @@ type ChatWindowProps = { messages: Message[], loading?: boolean };
 
 const aiLoadingMessage: Message = {
     id: -1,
-    author: 'ai',
+    author: Author.SOUS_CHEF,
     message: '...',
 }
 

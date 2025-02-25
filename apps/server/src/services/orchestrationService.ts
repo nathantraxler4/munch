@@ -1,5 +1,5 @@
 import { zodResponseFormat } from 'openai/helpers/zod';
-import type { Message } from 'types';
+import { Author, type Message } from 'types';
 import { z } from 'zod';
 import logger from '../utils/logger';
 import * as humanService from './humanService';
@@ -22,12 +22,12 @@ type RouteResponse = z.infer<typeof RouteResponseFormat>;
 
 export async function respond(prompt: string) {
     let messages = memory.get(1) ?? [];
-    const humanMessage: Message = { id: messages.length, author: 'user', message: prompt };
+    const humanMessage: Message = { id: messages.length, author: Author.USER, message: prompt };
     memory.set(1, [...messages, humanMessage]);
     const action = await routeRequest(memory.get(1) ?? []);
     const response = await executeAction(action);
     messages = memory.get(1) ?? [];
-    const aiMessage: Message = { id: messages.length, author: 'sous_chef', ...response };
+    const aiMessage: Message = { id: messages.length, author: Author.SOUS_CHEF, ...response };
     memory.set(1, [...messages, aiMessage]);
 
     return response;

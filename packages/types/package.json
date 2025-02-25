@@ -1,7 +1,6 @@
 {
     "name": "types",
-    "main": "src/types.ts",
-    "types": "src/types.ts",
+    "main": "src/index.ts",
     "dependencies": {
         "typescript": "latest"
     }

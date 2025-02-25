@@ -3,7 +3,7 @@
 import ChatWindow from '@/components/ChatWindow';
 import { useMutation } from '@apollo/client';
 import { useEffect, useState } from 'react';
-import type { Message } from 'types';
+import { Author, type Message } from 'types';
 import { PromptForm } from '../components/PromptForm';
 import { PROMPT_AGENT } from '../graphql/mutations';
 
@@ -37,7 +37,7 @@ export default function Home() {
         event.preventDefault();
         if (userInput.trim().length > 0) {
             const userMessage: Message = {
-                author: 'user',
+                author: Author.USER,
                 message: userInput,
             }
             setConversationMessages((prev) => [...prev, userMessage]);
