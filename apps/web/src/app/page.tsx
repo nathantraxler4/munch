@@ -19,7 +19,6 @@ export default function Home() {
 
     useEffect(() => {
         if (data) {
-            console.log(data)
             setConversationMessages((prev) => [...prev, data.promptAgent]);
         }
     }, [data]);

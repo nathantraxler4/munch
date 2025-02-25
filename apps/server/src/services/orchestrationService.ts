@@ -30,7 +30,7 @@ export async function respond(prompt: string) {
     const aiMessage: Message = { id: messages.length, author: Author.SOUS_CHEF, ...response };
     memory.set(1, [...messages, aiMessage]);
 
-    return response;
+    return aiMessage;
 }
 
 async function routeRequest(messages: Message[]): Promise<Action> {
