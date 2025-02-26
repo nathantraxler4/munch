@@ -63,7 +63,6 @@ export default function Home() {
             </div>
 
             <PromptForm
-                className="py-4"
                 userInput={userInput}
                 onInputChange={handleInputChange}
                 onSubmit={handleSubmit}
